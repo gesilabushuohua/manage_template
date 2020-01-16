@@ -1,7 +1,6 @@
 <template>
-  <!--  <top-menu-layout>
+ <!--  <top-menu-layout>
     <template v-slot:nav>
-      logo 标题 
       <div class="logo">
         <img src="@/assets/images/logo.jpeg" />
         <span class="title">SYSTEM MANAGE</span>
@@ -9,15 +8,15 @@
       <horizontal-menu :menus="menus" />
     </template>
     <template v-slot:main>
-      <h1>内容</h1>
+      <router-view />
     </template>
-  </top-menu-layout>-->
-  <side-menu-layout>
+  </top-menu-layout> -->
+   <side-menu-layout>
     <template v-slot:nav>
       <side-menu :menus="menus" />
     </template>
     <template v-slot:main>
-      <h1>内容</h1>
+      <router-view />
     </template>
   </side-menu-layout>
 </template>
@@ -43,11 +42,11 @@ export default {
           children: [
             {
               cName: '子菜单一',
-              path: '/home'
+              path: '/about'
             },
             {
               cName: '子菜单二',
-              path: '/home'
+              path: '/h2'
             }
           ]
         }
