@@ -20,6 +20,7 @@
 }
 
 nav {
+  position: relative;
   width: 200px;
   max-height: 100%;
   background-color: #fff;

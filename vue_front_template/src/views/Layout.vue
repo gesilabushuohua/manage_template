@@ -1,5 +1,5 @@
 <template>
- <!--  <top-menu-layout>
+  <!--  <top-menu-layout>
     <template v-slot:nav>
       <div class="logo">
         <img src="@/assets/images/logo.jpeg" />
@@ -10,10 +10,11 @@
     <template v-slot:main>
       <router-view />
     </template>
-  </top-menu-layout> -->
-   <side-menu-layout>
+  </top-menu-layout>-->
+  <side-menu-layout>
     <template v-slot:nav>
       <side-menu :menus="menus" />
+      <account is-bottom />
     </template>
     <template v-slot:main>
       <router-view />
@@ -26,9 +27,16 @@ import TopMenuLayout from '@/components/layout/TopMenuLayout';
 import SideMenuLayout from '@/components/layout/SideMenuLayout';
 import HorizontalMenu from '@/components/HorizontalMenu';
 import SideMenu from '@/components/SideMenu';
+import Account from '@/components/Account';
 export default {
   name: 'Layout',
-  components: { TopMenuLayout, SideMenuLayout, HorizontalMenu, SideMenu },
+  components: {
+    TopMenuLayout,
+    SideMenuLayout,
+    HorizontalMenu,
+    SideMenu,
+    Account
+  },
   props: {},
   data() {
     return {

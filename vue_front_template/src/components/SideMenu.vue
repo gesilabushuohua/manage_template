@@ -48,7 +48,7 @@ export default {
     this.initMenu();
   },
   methods: {
-    
+
     //  判断是否拥有子级
     hasChildren(menu) {
       return menu.children && menu.children.length > 0;
@@ -63,20 +63,21 @@ export default {
       const {
         dataset: { hasParent, isLeaf }
       } = curMenuDom;
+
       //  存在父级,菜单在二级,展开一级，显示二级菜单
       if (hasParent) {
         const parent = curMenuDom.parentElement.parentElement;
         parent.classList.toggle(menuOpenClassName);
       }
+      
       //  添加菜单激活样式
       this.handleMenuActiveClass(curMenuDom);
     },
 
     /* 
-    @function 点击菜单，添加激活样式，移出旧激活样式
+    @function 点击菜单，添加|移出激活样式
     */
     handleMenuClick(event) {
-
       //  获取 menu-item dom
       let curMenuDom = event.target;
       if (!curMenuDom.classList.contains(menuClassName)) {
@@ -89,7 +90,7 @@ export default {
       } = curMenuDom;
 
       //  跳转路径不存在，或当前路径与跳转路径相同，不做任何操作
-      if (!path || path === lastPath) {
+      if (path === lastPath) {
         return;
       }
 
@@ -97,7 +98,7 @@ export default {
       if (!hasParent && !isLeaf) {
         const parent = curMenuDom.parentElement;
         parent.classList.toggle(menuOpenClassName);
-      } else {
+      } else if (path) {
         const lastMenuDom = document.getElementById(lastPath);
 
         //  移除旧菜单激活样式
@@ -132,6 +133,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 $actived-color: #3c80ff;
+$height: 40px;
 
 .menu {
   padding: 0;
@@ -140,8 +142,8 @@ $actived-color: #3c80ff;
   .menu-item {
     position: relative;
     padding: 5px 10px;
-    height: 40px;
-    line-height: 40px;
+    height: $height;
+    line-height: $height;
     cursor: pointer;
     border-right: 4px solid transparent;
   }
