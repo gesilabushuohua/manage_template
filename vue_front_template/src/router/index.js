@@ -5,6 +5,7 @@ const Login = () => import('@/views/Login');
 const Layout = () => import('@/views/Layout');
 const About = () => import('@/views/About');
 const Home = () => import('@/views/Home');
+const TableBuilderEle = () => import('@/views/builder/TableBuilderEle');
 
 Vue.use(VueRouter);
 
@@ -30,6 +31,11 @@ const routes = [
         component: Home
       }
     ]
+  },
+  {
+    path: '/tableBuilderEle',
+    name: 'tableBuilderEle',
+    component: TableBuilderEle
   }
 ];
 

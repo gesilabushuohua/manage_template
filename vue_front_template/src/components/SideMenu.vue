@@ -2,8 +2,8 @@
   <ul class="menu menus">
     <li v-for="(menu,index) in menus" :key="index">
       <p
-        class="menu-item"
         :id="menu.path"
+        class="menu-item"
         :data-is-leaf="!hasChildren(menu)"
         @click="handleMenuClick"
       >
