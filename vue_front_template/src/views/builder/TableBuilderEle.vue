@@ -92,8 +92,38 @@ export default {
     this.tableStructStr = JSON.stringify(this.tableStruct, null, 2);
   },
   methods: {
+    
     // 更新表格渲染结构
-    handleUpdateTabelStruct() {},
+    handleUpdateTabelStruct() {
+      let obj = {};
+      try {
+        obj = JSON.parse(this.tableStructStr);
+        this.tableStructStr = JSON.stringify(obj, null, 2);
+      } catch (err) {
+        this.visible.tableStructError = true;
+        return;
+      }
+      this.visible.tableStructError = false;
+      this.tableStruct = { ...obj };
+      this.updateDataStructByTableStruct();
+    },
+
+    updateDataStructByTableStruct() {
+      const {
+        dataStruct,
+        tableStruct: { column }
+      } = this;
+      const addParamFn = () => {
+        return 'val';
+      };
+      const newStruct = this.changeFieldsByParams(
+        addParamFn,
+        dataStruct,
+        column
+      );
+      this.dataStruct = { ...newStruct };
+      this.dataStructStr = JSON.stringify(this.dataStruct, null, 2);
+    },
 
     // 跟新数据结构
     handleUpdateDataStruct() {
@@ -107,12 +137,11 @@ export default {
       }
       this.visible.dataStructError = false;
       this.dataStruct = { ...obj };
-      console.log('handleUpdateDataStruct');
-      this.dataStructUpdateTableStruct();
+      this.updateTableStructByDataStruct();
     },
 
     // 根据 datastruct，添加|删除列,更新 tableStruct，tableStructStr
-    dataStructUpdateTableStruct() {
+    updateTableStructByDataStruct() {
       const {
         dataStruct,
         tableStruct: { column }
@@ -163,7 +192,7 @@ export default {
     addFieldsByParams(addParamFn, uParams, byParams) {
       for (let key in byParams) {
         if (!uParams[key]) {
-          uParams[key] = addParamFn();
+          uParams[key] = addParamFn(key);
         }
       }
       return uParams;
