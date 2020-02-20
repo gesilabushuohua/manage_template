@@ -1,5 +1,8 @@
 /* 
 @function 基于 element-UI 框架，表格生成器
+使用说明
+1、按要求填写json 数据结构，点击运行；
+2、生产相应表格，点击复制，显示 templte 代码，复制即可
  */
 <template>
   <div class="contain">
@@ -9,11 +12,39 @@
           <span>表格</span>
           <span>复制代码</span>
         </p>
+        <div class="table">
+          <element-table-template
+            :data-struct="jsxDataStruct"
+            :table-struct="jsxTableStruct"
+            :table-fun-columns="checkList"
+            :operate-list="operateList"
+          />
+        </div>
+      </div>
+      <div class="inline-item">
+        <p class="title">
+          <span>操作</span>
+          <span @click="handleUpdateFunColumns">运行</span>
+        </p>
+        <div class="text-area">
+          <p>功能</p>
+          <el-checkbox-group v-model="checkList">
+            <el-checkbox label="selection"></el-checkbox>
+            <el-checkbox label="index"></el-checkbox>
+          </el-checkbox-group>
+
+          <p>操作</p>
+          <el-checkbox-group v-model="operateList">
+            <el-checkbox label="add"></el-checkbox>
+            <el-checkbox label="edit"></el-checkbox>
+            <el-checkbox label="delete"></el-checkbox>
+          </el-checkbox-group>
+        </div>
       </div>
       <div class="inline-item" :class="visible.tableStructError?'block-error':''">
         <p class="title">
           <span>表格渲染结构</span>
-          <span @click="handleUpdateTabelStruct">运行</span>
+          <span @click="handleUpdateByTableStructStr">运行</span>
         </p>
         <div class="text-area">
           <el-input
@@ -29,7 +60,7 @@
       <div class="inline-item" :class="visible.dataStructError?'block-error':''">
         <p class="title">
           <span>数据结构</span>
-          <span @click="handleUpdateDataStruct">运行</span>
+          <span @click="handleUpdateByDataStructStr">运行</span>
         </p>
         <div class="text-area">
           <el-input
@@ -48,26 +79,29 @@
 </template>
 
 <script>
+import { elementTableTemplate } from './TableEleJSX';
 export default {
   name: 'TableBuilderEle',
-  components: {},
+  components: { elementTableTemplate },
   props: {},
   data() {
     return {
-      textarea1: '',
-      textarea2: '',
-
       // 表格渲染结构
       tableStruct: {
-        column: {
-          date: { title: '日期', prop: 'date' },
-          name: { title: '姓名', prop: 'name' },
-          address: { title: '地址', prop: 'address' }
-        }
+        columns: [
+          { title: '日期', prop: 'date' },
+          { title: '姓名', prop: 'name' },
+          { title: '地址', prop: 'address' }
+        ]
       },
 
       // 表格渲染结构字符串
       tableStructStr: '',
+
+      // 表格自定义列，多选，序号
+      checkList: [],
+      // 增删改
+      operateList: [],
 
       dataStruct: {
         date: '2016-05-02',
@@ -81,22 +115,65 @@ export default {
       visible: {
         dataStructError: false,
         tableStructError: false
-      }
+      },
+
+      jsxDataStruct: {},
+      jsxTableStruct: {},
+      jsxFunColums: [],
+      jsxOperateList: []
     };
   },
 
-  watch: {},
-  created() {},
-  mounted() {
-    this.dataStructStr = JSON.stringify(this.dataStruct, null, 2);
+  created() {
+   this.dataStructStr = JSON.stringify(this.dataStruct, null, 2);
     this.tableStructStr = JSON.stringify(this.tableStruct, null, 2);
+    this.jsxDataStruct = { ...this.dataStruct };
+    this.jsxTableStruct = { ...this.tableStruct };
+    this.jsxFunColums = [...this.checkList];
+    this.jsxOperateList = [...this.operateList];
   },
   methods: {
-    // 更新表格渲染结构
-    handleUpdateTabelStruct() {},
+    // 更新表格功能列,(附：使用该方法减少 jsx 数据响应)
+    handleUpdateFunColumns() {
+      this.jsxFunColums = [...this.checkList];
+      this.jsxOperateList = [...this.operateList];
+    },
+    // 更新渲染结构
+    handleUpdateByTableStructStr() {
+      let obj = {};
+      try {
+        obj = JSON.parse(this.tableStructStr);
+        this.tableStructStr = JSON.stringify(obj, null, 2);
+      } catch (err) {
+        this.visible.tableStructError = true;
+        return;
+      }
+      this.visible.tableStructError = false;
+      this.tableStruct = { ...obj };
+      this.updateDataStructByTableStruct();
+    },
 
-    // 跟新数据结构
-    handleUpdateDataStruct() {
+    // 根据 tablestructStr，更新 tableStruct、dataStruct、dataStructStr
+    updateDataStructByTableStruct() {
+      const {
+        dataStruct,
+        tableStruct: { columns }
+      } = this;
+      const addParamFn = () => 'val';
+      const columnObj = this.changeArrayToObject(columns);
+      const newStruct = this.changeFieldsByParams(
+        addParamFn,
+        dataStruct,
+        columnObj
+      );
+      this.dataStruct = { ...newStruct };
+      this.dataStructStr = JSON.stringify(this.dataStruct, null, 2);
+      this.jsxDataStruct = { ...this.dataStruct };
+      this.jsxTableStruct = { ...this.tableStruct };
+    },
+
+    // 根据 dataStructStr，更新 dataStruct、tableStruct、tableStructStr
+    handleUpdateByDataStructStr() {
       let obj = {};
       try {
         obj = JSON.parse(this.dataStructStr);
@@ -107,7 +184,6 @@ export default {
       }
       this.visible.dataStructError = false;
       this.dataStruct = { ...obj };
-      console.log('handleUpdateDataStruct');
       this.dataStructUpdateTableStruct();
     },
 
@@ -115,14 +191,50 @@ export default {
     dataStructUpdateTableStruct() {
       const {
         dataStruct,
-        tableStruct: { column }
+        tableStruct: { columns }
       } = this;
       const addParamFn = key => {
         return { title: 'name', prop: key };
       };
-      const newCol = this.changeFieldsByParams(addParamFn, column, dataStruct);
-      this.tableStruct.column = { ...newCol };
+      const columnObj = this.changeArrayToObject(columns);
+      const newCol = this.changeFieldsByParams(
+        addParamFn,
+        columnObj,
+        dataStruct
+      );
+      const colArray = this.changeObjectToArray(newCol);
+      this.tableStruct.columns = [...colArray];
       this.tableStructStr = JSON.stringify(this.tableStruct, null, 2);
+      this.jsxDataStruct = { ...this.dataStruct };
+      this.jsxTableStruct = { ...this.tableStruct };
+    },
+
+    /* 
+    @function 辅助，将数组转化为对象，便于对比两数据结构
+    @param array 将转化数组
+    @return object 返回对象结果
+    */
+    changeArrayToObject(array) {
+      let obj = {};
+      array.forEach(val => {
+        if (val.prop) {
+          obj[val.prop] = val;
+        }
+      });
+      return obj;
+    },
+
+    /* 
+    @function 辅助，将对象转化为数组，还原处理后的数据
+    @param object 将转化数组
+    @return array 返回对象结果
+    */
+    changeObjectToArray(object) {
+      let array = [];
+      for (let key in object) {
+        array.push(object[key]);
+      }
+      return array;
     },
 
     /* 
@@ -163,7 +275,7 @@ export default {
     addFieldsByParams(addParamFn, uParams, byParams) {
       for (let key in byParams) {
         if (!uParams[key]) {
-          uParams[key] = addParamFn();
+          uParams[key] = addParamFn(key);
         }
       }
       return uParams;
@@ -172,6 +284,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+::v-deep .el-checkbox {
+  margin: 5px 0;
+}
+
 .contain {
   height: 100%;
   background-color: #ebebeb;
@@ -197,11 +313,15 @@ export default {
   }
 
   .inline-item:nth-child(2) {
-    width: 23%;
+    width: 10%;
   }
 
   .inline-item:nth-child(3) {
-    width: 23%;
+    width: 20%;
+  }
+
+  .inline-item:nth-child(4) {
+    width: 18%;
   }
 
   .title {
@@ -232,6 +352,10 @@ export default {
   .text-area {
     margin: 10px 20px;
   }
+}
+
+.table {
+  margin: 20px;
 }
 
 .block-error {
