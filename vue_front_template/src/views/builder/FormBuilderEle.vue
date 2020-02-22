@@ -2,7 +2,9 @@
 @function 基于 element-UI 框架，表单生成器
  */
  <template>
-  <div class="wrapper"></div>
+  <div class="wrapper">
+    
+  </div>
 </template>
  
  <script>

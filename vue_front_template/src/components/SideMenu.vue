@@ -1,3 +1,19 @@
+/* 
+ 二级左侧边菜单
+ @prop menus 菜单列表
+  menus:[
+    {
+      cName:'导航名', 必填
+      path:'路径',
+      children:[
+         {
+              cName: "子菜单一",
+              path: "/subpath"
+          }
+      ]
+    }
+  ]
+ */
 <template>
   <ul class="menu menus">
     <li v-for="(menu,index) in menus" :key="index">

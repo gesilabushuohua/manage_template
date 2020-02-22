@@ -14,7 +14,7 @@
   <side-menu-layout>
     <template v-slot:nav>
       <side-menu :menus="menus" />
-      <account is-bottom />
+     <!--  <account is-bottom /> -->
     </template>
     <template v-slot:main>
       <router-view />
@@ -27,15 +27,15 @@ import TopMenuLayout from '@/components/layout/TopMenuLayout';
 import SideMenuLayout from '@/components/layout/SideMenuLayout';
 import HorizontalMenu from '@/components/HorizontalMenu';
 import SideMenu from '@/components/SideMenu';
-import Account from '@/components/Account';
+/* import Account from '@/components/Account'; */
 export default {
   name: 'Layout',
   components: {
     TopMenuLayout,
     SideMenuLayout,
     HorizontalMenu,
-    SideMenu,
-    Account
+    SideMenu/* ,
+    Account */
   },
   props: {},
   data() {
