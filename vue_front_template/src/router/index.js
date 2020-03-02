@@ -12,6 +12,7 @@ const About = () => import('@/views/About.vue');
 const Home = () => import('@/views/Home.vue');
 const TableBuilderEle = () => import('@/views/builder/TableBuilderEle.vue');
 const FormTemplateEle = () => import('@/views/template/FormTemplateEle.vue');
+const TableTemplateEle = () => import('@/views/template/TableTemplateEle.vue');
 
 Vue.use(VueRouter);
 
@@ -47,6 +48,11 @@ const routes = [
     path: '/formTemEle',
     name: 'FormTemplateEle',
     component: FormTemplateEle
+  },
+  {
+    path: '/tableTemEle',
+    name: 'TableTemplateEle',
+    component: TableTemplateEle
   }
 ];
 
