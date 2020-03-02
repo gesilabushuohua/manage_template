@@ -196,6 +196,7 @@ export default {
         dataStruct,
         columnObj
       );
+     
       this.dataStruct = { ...newStruct };
       this.dataStructStr = JSON.stringify(this.dataStruct, null, 2);
       this.jsxDataStruct = { ...this.dataStruct };

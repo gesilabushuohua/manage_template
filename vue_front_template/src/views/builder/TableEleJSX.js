@@ -95,7 +95,7 @@ export const elementTableTemplate = Vue.component('element-table-template', {
           switch (column.type) {
             case 'switch':
               return (
-                <el-table-column label={column.title}>
+                <el-table-column key={updateKey('switch')} label={column.title}>
                   <div slot-scope='scope'>
                     <el-switch
                       v-model={column.pro}
@@ -107,7 +107,7 @@ export const elementTableTemplate = Vue.component('element-table-template', {
               );
             case 'image':
               return (
-                <el-table-column label={column.title}>
+                <el-table-column key={updateKey('image')} label={column.title}>
                   <template slot-scope='scope'>
                     <img src='' />
                   </template>
