@@ -6,10 +6,9 @@
 
 import Vue from 'vue';
 
+const updateKey = (k1, k2) => `${k1}-${k2}-${new Date()}`;
 
 
-
-//  作废，UI 组件 class 易作废
 const btn = {
   functional: true,
   name: 'btn',
@@ -33,10 +32,12 @@ const btn = {
 
 const img = {
   functional: true,
-  name: 'btn',
+  name: 'img',
   render(h, context) {
     const cell = context.props.data;
-    console.log(context);
+    const { row } = cell;
+    cell.src = row[cell.prop];
+    console.log('img', row[cell.prop], cell)
     return <img {...{ attrs: cell }} />;
   }
 };
@@ -69,26 +70,23 @@ export const ColumnPlus = Vue.component('ColumnPlus', {
   },
   render(h) {
     const { colConfig } = this;
-    const { renderCells } = colConfig;
-    const { render } = colConfig;
+    const { renderCells2, renderCells, render } = colConfig;
+    const { } = colConfig;
 
-    //  作废
     // 渲染 renderCells 元素 
     if (renderCells && renderCells.length > 0) {
-      delete colConfig.renderCells;
-      const that = this;
+      console.log(colConfig, updateKey(colConfig.prop, 'temp'));
       return (
         <el-table-column
           {...{ attrs: colConfig }}
+          key={updateKey(colConfig.label, 'temp')}
           {...{
             scopedSlots: {
               default: scope => {
-                return renderCells.map(cell => {
+                return renderCells.map((cell, ci) => {
                   const item = cellType[cell.ele];
                   const copy = { ...cell };
-                  if (copy.ele === 'img' && copy.prop) {
-                    copy.src = scope.row[copy.prop];
-                  }
+
 
                   if (copy.ele === 'btn' && cell.opt) {
                     if (cell.opt === 'edit') {
@@ -100,6 +98,8 @@ export const ColumnPlus = Vue.component('ColumnPlus', {
                     }
                   }
                   copy.row = scope.row;
+
+                  console.log(copy)
                   return <item data={copy} />;
                 });
               }
@@ -136,6 +136,23 @@ export const ColumnPlus = Vue.component('ColumnPlus', {
       );
     }
 
+    // 使用 vue createElement 参数 
+    if (renderCells2) {
+
+      return (
+        <el-table-column
+          {...{ attrs: colConfig }}
+          {...{
+            scopedSlots: {
+              default: scope => {
+                return renderCells2(h, scope.row);
+              }
+            }
+          }}
+        ></el-table-column>
+      );
+    }
+
     return <el-table-column {...{ attrs: colConfig }} />;
   }
 });
@@ -144,7 +161,7 @@ export const ColumnPlus = Vue.component('ColumnPlus', {
 /*
 Dome 事例
 render，renderCells 只支持其中一种
-
+  //  作废
  {
     label: '头像',
     render:(h,{row,index})=>{
@@ -152,7 +169,7 @@ render，renderCells 只支持其中一种
     }
   }
 
-  //  作废
+
   {
     label: '抓怕',
     renderCells:[
@@ -163,7 +180,7 @@ render，renderCells 只支持其中一种
     ]
   }
 
-  //  作废
+
   {
     label: '操作',
     renderCells: [
@@ -181,5 +198,16 @@ render，renderCells 只支持其中一种
     ]
   }
 
+   // 使用 createdElement
+   {
+    label: '操作',
+    renderCells2: (h,row)=>{
+      return h('img',{
+        attrs:{
+          src:row.src
+        }
+      })
+    }
+  }
 
 */

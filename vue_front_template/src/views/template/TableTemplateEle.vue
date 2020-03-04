@@ -31,82 +31,36 @@
 </template>
 
 <script>
-import { ColumnPlus } from './tableColumnPlus.js';
-import { tableMixin } from '@/mixis/tableMixin.js';
-
-// 表格增删查改函数
-const getTableDataFn = () =>
-  new Promise(resolve => {
-    resolve();
-  });
-const addTableDataFn = () =>
-  new Promise(resolve => {
-    resolve();
-  });
-const editTableDataFn = () =>
-  new Promise(resolve => {
-    resolve();
-  });
-const delTableDataFn = () =>
-  new Promise(resolve => {
-    resolve();
-  });
-
-//  表格行列设置
-const columns = [
-  {
-    label: '时间',
-    prop: 'date'
-  },
-  {
-    label: '姓名',
-    prop: 'name'
-  },
-  {
-    label: '头像',
-    renderCells: [
-      {
-        ele: 'img',
-        prop: 'src'
-      }
-    ]
-  },
-  {
-    label: '地址',
-    prop: 'address'
-  },
-  {
-    label: '操作',
-    renderCells: [
-      {
-        ele: 'btn',
-        type: 'text',
-        opt: 'edit',
-        addClass: 'add',
-        disabled: false,
-        text: '编辑'
-      },
-      {
-        ele: 'btn',
-        icon: 'el-icon-edit',
-        text: '删除',
-        opt: 'del'
-      }
-    ]
-  }
-];
+import { ColumnPlus } from '@/assets/js/tableColumnPlus.js';
 
 export default {
-  name: 'TableTemPlateEle',
+  name: 'TableTemplateEle',
   components: { ColumnPlus },
-  props: {},
-  mixins: [
-    //  封装表格常用函数
-    tableMixin
-  ],
+  props: {
+    columns: {
+      type: Array,
+      required: true
+    },
+    getTableDataFn: {
+      type: Function,
+      default: true
+    },
+    addTableDataFn: {
+      type: Function,
+      default: null
+    },
+    editTableDataFn: {
+      type: Function,
+      default: null
+    },
+    delTableDataFn: {
+      type: Function,
+      default: null
+    }
+  },
+
   data() {
     return {
-      columns,
       tableData: [],
       currentPage: 1,
       pageSize: 20,
@@ -116,33 +70,7 @@ export default {
   computed: {},
   watch: {},
   created() {
-    this.tableData = [
-      {
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        src: 'aaa'
-      },
-      {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄',
-        src:
-          'http://img4.imgtn.bdimg.com/it/u=1223780803,2412931209&fm=26&gp=0.jpg'
-      },
-      {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        src: 'aaa'
-      },
-      {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄',
-        src: 'aaa'
-      }
-    ];
+    this.requsetGetTableData();
   },
   mounted() {},
   methods: {
@@ -157,7 +85,7 @@ export default {
       this.requsetGetTableData();
     },
     requsetGetTableData() {
-      if (!getTableDataFn) {
+      if (!this.getTableDataFn) {
         return;
       }
       const { currentPage, pageSize } = this;
@@ -166,34 +94,39 @@ export default {
         pageSize
       };
       console.log('getTableDataFn');
-      getTableDataFn(param)
-        .then(res => {})
+      this.getTableDataFn(param)
+        .then(res => {
+          const { code, data } = res;
+          if (code === 0) {
+            this.tableData = data;
+          }
+        })
         .catch(err => {});
     },
     requsetAddTableData() {
-      if (!addTableDataFn) {
+      if (!this.addTableDataFn) {
         return;
       }
       const param = {};
-      addTableDataFn(param)
+      this.addTableDataFn(param)
         .then(res => {})
         .catch(err => {});
     },
     requsetEditTableData() {
-      if (!editTableDataFn) {
+      if (!this.editTableDataFn) {
         return;
       }
       const param = {};
-      editTableDataFn(param)
+      this.editTableDataFn(param)
         .then(res => {})
         .catch(err => {});
     },
     requsetDelTableData() {
-      if (!delTableDataFn) {
+      if (!this.delTableDataFn) {
         return;
       }
       const param = {};
-      delTableDataFn(param)
+      this.delTableDataFn(param)
         .then(res => {})
         .catch(err => {});
     },
@@ -209,7 +142,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .main {
-  height: 80vh;
+  height: 90%;
 }
 
 .footer {
