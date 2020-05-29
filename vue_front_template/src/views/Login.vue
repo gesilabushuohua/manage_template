@@ -4,10 +4,17 @@
       <div class="login-from">
         <h2 class="title">System Manage</h2>
         <h4 class="content">Sign in</h4>
+
+        <!-- 登记表单 -->
         <div class="form">
           <el-form ref="form" :model="form" status-icon :rules="rules">
             <el-form-item prop="account">
-              <el-input v-model="form.account" prefix-icon="el-icon-user" autocomplete="off" />
+              <el-input
+                v-model="form.account"
+                prefix-icon="el-icon-user"
+                autocomplete="off"
+                clearable
+              />
             </el-form-item>
             <el-form-item prop="passWord">
               <el-input
@@ -15,11 +22,12 @@
                 prefix-icon="el-icon-lock"
                 type="password"
                 autocomplete="off"
+                clearable
               />
             </el-form-item>
             <el-form-item prop="passWord">
-              <el-input v-model="form.captcha" prefix-icon="el-icon-key" autocomplete="off">
-                <el-button slot="append" @click="requestGetCode">获取验证码</el-button>
+              <el-input v-model="form.captcha" prefix-icon="el-icon-key" clearable>
+                <el-button slot="append" @click="getValidCodeImage">获取验证码</el-button>
               </el-input>
             </el-form-item>
           </el-form>
@@ -31,8 +39,9 @@
 </template>
 
 <script>
-import { basicLogin, digestLogin, getCode, digestLoginURL } from '@/api/index';
-import { generateAuthentication } from '@/assets/js/generateAuthenticationByRules';
+
+/* import { basicLogin, digestLogin, getCode, digestLoginURL } from '@/api/index'; */
+import { generateAuthentication } from '@/utils/index.js';
 
 export default {
   name: 'Login',
@@ -56,91 +65,79 @@ export default {
   created() {},
   mounted() {},
   methods: {
+
+    // 提交表单
     submitForm() {
       this.$refs.form.validate(valid => {
-        if (valid) {
-          this.requestBasicLogin();
-        } else {
-          console.log('error submit!!');
-          return false;
+        if (!valid) {
+          console.log('from validate error submit!!');
+          return;
         }
+
+        // 简单登录
+        this.basicLogin();
+
+        // 摘要登录
+        /*  this.digestLogin(); */
       });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-    },
-    requestBasicLogin() {
-      const param = { ...this.from };
+
+    // 简单登录
+    basicLogin() {
+      const params = { ...this.from };
       this.isLoging = true;
-      basicLogin(param)
+      new Promise(params)
         .then(res => {
-          this.isLoging = false;
-          console.log({ res, param });
+          console.log({ res, params });
+          const { code } = res;
+          if (code === 0) {
+            this.$router.push('/home');
+          }
         })
-        .catch(err => {
+        .finally(() => {
           this.isLoging = false;
         });
     },
-    async requestDigestLogin() {
+
+    // 摘要登录
+    async digestLogin() {
       const param = { ...this.from };
       this.isLoging = true;
-      let Authenticate = await digestLogin();
+
+      // 登录,请求获取 验证码
+      const Authenticate = await new Promise();
+
+      const digestLoginURL = '';
 
       //  TODO，未与后端商议，解析生成格式过程中有问题
       const Authorization = generateAuthentication(
         digestLoginURL,
         Authenticate
       );
+
       sessionStorage.setItem('Authorization', Authorization);
-      digestLogin({ captcha: param.captcha })
+
+      // 结合验证码，登录
+      new Promise({ captcha: param.captcha })
         .then(res => {
-          this.isLoging = false;
           console.log({ res });
-
-          /*  
-           const {
-            data: { code, message, data },
-            headers: { authorization }
-          } = res;
-
+          const { code } = res;
           if (code === 0) {
-            const { role, id } = data;
-            sessionStorage.setItem('token', authorization);
-            sessionStorage.setItem('account', param.account);
-            sessionStorage.setItem('account_id', id);
-            this.$store.commit('setUserId', id);
-            if (role) {
-              const { permissions } = role;
-              this.$store.commit('setRole', role.role);
-              this.$store.commit('setPermisson', permissions);
-            }
-           
-            
-          } else {
-            if (
-              `${message}` === '验证码过时, 请重新获取' ||
-              `${message}` === '验证码不正确 , 请重新输入'
-            ) {
-              if (`${message}` === '验证码过时, 请重新获取') {
-                this.$message.error('验证码已过时');
-                this.getCode();
-              }
-              if (`${message}` === '验证码不正确 , 请重新输入') {
-                this.$message.error('验证码不正确');
-              }
-              return;
-            }
-            message && this.$message.error(message);
-          } */
+            this.$router.push('/home');
+          }
         })
         .catch(e => {
-          this.isLoging = false;
           const response = e.response || null;
           const msg = response && response.data && response.data.message;
           msg && this.$message.error(`${msg}`);
+        })
+        .finally(() => {
+          this.isLoging = false;
         });
     },
-    requestGetCode() {
+
+    // 根据账号生成图片文件流
+    getValidCodeImage() {
       const { account } = this.form;
       if (!account) {
         this.$refs.form.validateField(['account'], errorMessage => {
@@ -148,11 +145,13 @@ export default {
         });
         return;
       }
-      getCode(account)
+      new Promise(account)
         .then(res => {
-          console.log('get code', { res });
+          console.log('get code image file steam', { res });
         })
-        .catch(err => {});
+        .catch(err => {
+          console.error(err);
+        });
     }
   }
 };
@@ -165,7 +164,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  min-width: 1366px;
+  min-width: 600px;
   min-height: 624px;
   background: url('../assets/images/bg6.jpg') no-repeat fixed;
   background-size: 100% auto;

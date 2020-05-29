@@ -1,3 +1,8 @@
+/*
+ * @Description: des
+ * @Date: 2020-05-26 10:19:17
+ * @Author: LB
+ */
 // 本文件主要用于生成摘要认证
 const crypto = require('crypto');
 
@@ -12,7 +17,7 @@ const encryptMD5 = str => {
 };
 
 /* 
-@function 生成摘要认证密码
+@function 生成摘要认证密码, 规则
 @param url 使用摘要认证的 路径
 @param str 后端传过来的认证码
 */
@@ -26,16 +31,16 @@ export const generateAuthentication = (url, str) => {
   let nonceStr = '';
   let opaqueStr = '';
   if (tokens.length > 0) {
-    let pattern = /\"(.*)\"/;
+    let pattern = /"(.*)"/;
     tokens.forEach(item => {
       if (item.indexOf('realm') > -1) {
-        realmStr = item.match(pattern)[1];
+        [, realmStr] = item.match(pattern);
       } else if (item.indexOf('qop') > -1) {
-        qopStr = item.match(pattern)[1];
+        [, qopStr] = item.match(pattern);
       } else if (item.indexOf('nonce') > -1) {
-        nonceStr = item.match(pattern)[1];
+        [, nonceStr] = item.match(pattern);
       } else if (item.indexOf('opaque') > -1) {
-        opaqueStr = item.match(pattern)[1];
+        [, opaqueStr] = item.match(pattern);
       }
     });
   }
@@ -44,19 +49,15 @@ export const generateAuthentication = (url, str) => {
     .substr(2);
   let codeAccount = encodeURIComponent(this.loginForm.account);
 
-  const HA1 = encryptMD5(
-    `${codeAccount}:${realmStr}:${this.loginForm.password}`
-  );
+  const HA1 = encryptMD5(`${codeAccount}:${realmStr}:${this.loginForm.password}`);
 
   const HA2 = encryptMD5(`POST:${url}`);
 
   const ncStr = Math.floor(Math.random() * 100);
 
-  const response = this.encryptMD5(
-    `${HA1}:${nonceStr}:${ncStr}:${cnonceStr}:${qopStr}:${HA2}`
-  );
+  const response = this.encryptMD5(`${HA1}:${nonceStr}:${ncStr}:${cnonceStr}:${qopStr}:${HA2}`);
 
-  let authorization = `Digest username="${codeAccount}", realm="${realmStr}", nonce="${nonceStr}", uri="${base}/digestLogin", qop="${qopStr}", response="${response}", opaque="${opaqueStr}", nc="${ncStr}", cnonce="${cnonceStr}"`;
+  let authorization = `Digest username="${codeAccount}", realm="${realmStr}", nonce="${nonceStr}", uri="${url}/digestLogin", qop="${qopStr}", response="${response}", opaque="${opaqueStr}", nc="${ncStr}", cnonce="${cnonceStr}"`;
 
   return authorization;
 };
