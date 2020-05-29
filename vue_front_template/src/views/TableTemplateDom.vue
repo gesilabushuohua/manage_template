@@ -1,5 +1,5 @@
 <!--
- * @Description: 科升蓝牙门禁
+ * @Description: XXX门禁
  * @Date: 2020-03-02 10:55:31
  * @Author: LB
  -->
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import TableTemplateEle from '@/components/TableTemplateEle.vue';
+import TableTemplateEle from '@/views/template/TableTemplateEle.vue';
 
 // 表格增删查改函数
 const getTableDataFn = () =>

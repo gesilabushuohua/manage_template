@@ -12,7 +12,7 @@
       label-width="100px"
       class="demo-ruleForm"
     >
-      <el-form-item label="活动名称" prop="name">
+      <!--   <el-form-item label="活动名称" prop="name">
         <el-input v-model="ruleForm.name"></el-input>
       </el-form-item>
       <el-form-item label="活动区域" prop="region">
@@ -62,15 +62,25 @@
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
-      </el-form-item>
+      </el-form-item>-->
+      <form-item-plus v-bind="{}" />
     </el-form>
   </div>
 </template>
 
 <script>
+import { FormItemPlus } from './formItemPlus.js';
+
+const items = [
+  {
+    label: '活动名称',
+    prop: 'name'
+  }
+];
+
 export default {
   name: 'FormTemplateEle',
-  components: {},
+  components: { FormItemPlus },
   props: {},
   data() {
     return {
@@ -133,6 +143,6 @@ export default {
 <style lang="scss" scoped>
 .form-template-ele {
   width: 800px;
-  margin: 0  auto;
+  margin: 0 auto;
 }
 </style>

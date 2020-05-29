@@ -13,6 +13,7 @@ const Home = () => import('@/views/Home.vue');
 const TableBuilderEle = () => import('@/views/builder/TableBuilderEle.vue');
 const FormTemplateEle = () => import('@/views/template/FormTemplateEle.vue');
 const TableTemplateEle = () => import('@/views/template/TableTemplateEle.vue');
+const TableTemplateEleDom = () => import('@/views/TableTemplateDom.vue');
 
 Vue.use(VueRouter);
 
@@ -28,9 +29,9 @@ const routes = [
     component: Layout,
     children: [
       {
-        path: '/about',
-        name: 'about',
-        component: About
+        path: '/tableDom',
+        name: 'TableTemplateEleDom',
+        component: TableTemplateEleDom
       },
       {
         path: '/h2',

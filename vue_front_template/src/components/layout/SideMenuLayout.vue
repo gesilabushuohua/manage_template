@@ -1,3 +1,8 @@
+<!--
+ * @Description: des
+ * @Date: 2020-01-03 17:45:59
+ * @Author: LB
+ -->
 /* 
  侧边菜单布局
  */
@@ -28,7 +33,6 @@ nav {
 
 main {
   margin: 10px;
-  padding: 20px;
   height: calc(100% - 60px);
   flex: 1;
   border-radius: 6px;

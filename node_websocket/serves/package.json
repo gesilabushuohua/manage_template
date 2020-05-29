@@ -1,0 +1,23 @@
+{
+  "name": "node_websocket",
+  "version": "1.0.0",
+  "description": "node websocket server",
+  "main": "index.js",
+  "dependencies": {
+    "nodejs-websocket": "^1.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "node",
+    "websocket"
+  ],
+  "author": "LB",
+  "license": "ISC"
+}

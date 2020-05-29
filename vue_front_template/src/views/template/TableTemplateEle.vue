@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { ColumnPlus } from '@/assets/js/tableColumnPlus.js';
+import { ColumnPlus } from './tableColumnPlus.js';
 
 export default {
   name: 'TableTemplateEle',
