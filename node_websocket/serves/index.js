@@ -9,6 +9,8 @@ const ws = require('nodejs-websocket');
 console.log('start open websocket');
 
 
+const connectionMap = {};
+
 // 创建连接
 const server = ws.createServer(function (connection) {
 
@@ -18,7 +20,15 @@ const server = ws.createServer(function (connection) {
 
   // 接收信息,类型 string
   connection.on('text', function (res) {
-    console.log('recevie text');
+    console.log('recevie text', res);
+    const resObj = JSON.parse(res);
+    const { use, to } = resObj;
+    if (use){
+      connectionMap[use] = connection;
+    }else{
+      broadcastText(to, res);
+    }
+      
   });
 
   // 接受到二进制内容
@@ -31,14 +41,12 @@ const server = ws.createServer(function (connection) {
       var newData = inStream.read()
       if (newData)
         data = Buffer.concat([data, newData], data.length + newData.length)
-    })
+    });
+
     inStream.on("end", function () {
       console.log("Received " + data.length + " bytes of binary data")
-      broadcast(connection, data);
-    })
-
-
-
+      broadcastBinary(connection, data);
+    });
 
   });
 
@@ -51,12 +59,31 @@ const server = ws.createServer(function (connection) {
   // 异常
   connection.on('error', function (code, reason) {
     console.log('ws throw error');
+    
   });
 
 });
 
+
+/* 
+  移除无效连接
+*/
+function removeConnection(connection) {
+  
+}
+
+// 广播消息, text
+function broadcastText(sender, text) {
+  server.connections.forEach(function (connection) {
+    if (sender !== connection) {
+      console.log('broadcast');
+      connection.sendText(text);
+    }
+  })
+};
+
 // 广播消息,二进制
-function broadcast(sender, stream) {
+function broadcastBinary(sender, stream) {
   server.connections.forEach(function (connection) {
     if (sender !== connection) {
       console.log('broadcast');

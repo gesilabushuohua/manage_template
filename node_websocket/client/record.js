@@ -4,19 +4,26 @@
     2、实时转码为 mp3 文件，websocket 实时上传至服务器
     3、服务器分发其他客户端
     4、客户端接收服务端数据，合并多个 mp3 文件，播放
+
+    Recorder API：
+   
+    TODO 
+    client1 发起通话
+    client2 接受通话
+    统一后，进行语音通信
     */
 
 // 开始执行
-window.onload = function init() {
+/* window.onload = function init() {
   console.log('onload');
-  const url = 'ws://127.0.0.1:8001';
+  const url = 'ws://192.168.205.104:8001';
   // 创建连接，监听相关事件，处理 onmessage 接收信息
   _createWSconnection(url);
   // 创建录音实例
   _createRecorderEntity();
   // 添加 录音授权/开始/结束/结束/播放 监听
   _addEvent();
-};
+}; */
 
 
 // 全局变量
@@ -54,16 +61,19 @@ let _realTimeSendTryWavTestSampleRate;
  * @return: void
  * @author: LB
  */
-function _createWSconnection(url) {
+function _createWSconnection(url, onMsg) {
   if (window.WebSocket && _ws === null) {
     _ws = new WebSocket(url);
 
     // 传输方式改为arraybuffer
-    _ws.binaryType = 'arraybuffer';
+   /*  _ws.binaryType = 'arraybuffer'; */
+
     _ws.onopen = function (e) {
       console.log('连接服务器成功');
-      _ws.send('connect' + Date.now());
+      const params = {use:curUse};
+      _ws.send(JSON.stringify(params));
     };
+
     _ws.onclose = function (e) {
       console.log('ws close');
       // 关闭录音
@@ -80,8 +90,9 @@ function _createWSconnection(url) {
     };
     _ws.onmessage = function (e) {
       const msg = e.data;
-      if (_onWSMessage) {
-        _onWSMessage(msg);
+      console.log('onmessage_______');
+      if (onMsg) {
+        onMsg(msg);
       }
     };
   }
@@ -89,19 +100,40 @@ function _createWSconnection(url) {
 
 
 
+
+
+// 文件片段间隔
+const space = 20;
 /**
- * @description: 接受 websocket msg
+ * @description: 接受 websocket msg，实时通话
  * @param {ArrayBuffer} 
  * @return: void
  * @author: LB
  */
-function _onWSMessage(msg) {
+function _onWSRealMessage(msg) {
   console.log('receive');
   // 存储接收文件
   _fileQueue.push(msg);
-
-  _realTimePlayMp3();
+  if (_fileQueue.length > space) {
+    _realTimePlayMp3();
+  }
 }
+
+// 数据加载进行立刻播放
+// 文件片越大，片段交接越顺畅
+// 把文件合成，与播放区分开
+
+function _openRecorder() {
+  _recorder.open(
+    function success() {
+      console.log('open success');
+    },
+    function fail() {
+      console.log('open fail');
+    }
+  );
+}
+
 
 // 监听操作
 function _addEvent() {
@@ -150,13 +182,13 @@ function _addEvent() {
         // 合并成功
         const successFn = function (fileBytes, duration, info) {
           console.log('Mp3Merge successFn');
-        /*   const audio = document.createElement('audio');
-          audio.controls = true;
-          document.body.appendChild(audio);
-          const blob = new Blob([fileBytes]);
-          // 简单利用URL生成播放地址，注意不用了时需要revokeObjectURL，否则霸占内存
-          audio.src = (window.URL || webkitURL).createObjectURL(blob);
-          audio.play(); */
+          /*   const audio = document.createElement('audio');
+            audio.controls = true;
+            document.body.appendChild(audio);
+            const blob = new Blob([fileBytes]);
+            // 简单利用URL生成播放地址，注意不用了时需要revokeObjectURL，否则霸占内存
+            audio.src = (window.URL || webkitURL).createObjectURL(blob);
+            audio.play(); */
         };
         console.log('Mp3Merge');
 
@@ -168,6 +200,11 @@ function _addEvent() {
   };
 }
 
+
+// 发送数据
+function _wsSend(params) {
+  _ws.send(params);
+}
 
 
 //重置环境
@@ -256,7 +293,7 @@ function _realTimeOnProcessClear(
   for (let i = _realTimeSendTryClearPrevBufferIdx; i < newBufferIdx; i++) {
     buffers[i] = null;
   }
-  _realTimeSendTryClearPrevBufferIdx =  newBufferIdx;
+  _realTimeSendTryClearPrevBufferIdx = newBufferIdx;
 
   //备份一下方便后面生成测试wav
   for (let i = newBufferIdx; i < buffers.length; i++) {
@@ -313,6 +350,7 @@ function _createAudio() {
   _audio.loop = false;
   _audio.onended = function () {
     if (_playFiles.length > 0) {
+      // 连续播放时间片
       _playAudio();
     }
   };
@@ -347,13 +385,13 @@ function _createRecorderEntity() {
     // 比特率kbps，其他参数使用默认配置
     bitRate: 16,
     // 录音实时回调，大约1秒调用12次本回调
-    onProcess: _onRecorderProcess,
+    /* onProcess: _onRecorderProcess,
 
     // 将直接得到的 PCM 片段编码生成 mp3 数据
     takeoffEncodeChunk: function (chunkBytes) {
       //接管实时转码，推入实时处理
       _realTimeSendTry(chunkBytes, false);
-    }
+    } */
   });
 }
 
