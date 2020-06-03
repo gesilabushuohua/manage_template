@@ -5,34 +5,46 @@
  */
 let curUse = null;
 let curSends = [];
-// type 1 自己信息, 0 其他人信息
-const msgType = {
-  SELF:1,
-  OTHER:0
-} 
+let audioDom = null;
+let isFirst = true;
 
 var app = new Vue({
   el: '#app',
   data() {
     return {
-      message: 'Hello Vue!',
+      from: 'test',
+      vedioURL:'',
       users: ['aa', 'bb', 'cc'],
       sends: ['aa', 'bb', 'cc'],
 
-      // type 1 自己信息, 0 其他人信息
+      // 音频播放列表
       fileMegs: [],
     };
   },
-  mounted() {},
+  mounted() {
+    const that = this;
+    const fileMegs = this.fileMegs;
+    audioDom = this.$refs.audio;
+    audioDom.loop = false;
+    audioDom.autoplay = true;
+    audioDom.onended = function () {
+      if (fileMegs.length > 0) {
+        fileMegs.shift();
+        audioDom.autoplay = true;
+        const [url] = fileMegs;
+        that.vedioURL = url;
+      }
+    }
+  },
   methods: {
-    addFileMsg(name, base64, type) {
-      const url = base64;
-      const fileMsg = {
-        name,
-        url,
-        type,
-      };
-      this.fileMegs.push(fileMsg);
+    addFileMsg(base64) {
+      console.log();
+      this.fileMegs.push(base64);
+      if(isFirst){
+        this.vedioURL =  base64;
+        audioDom.autoplay = true;
+      }
+      
     },
     getUse() {
       const doms = document.getElementsByClassName('use');
@@ -68,15 +80,15 @@ var app = new Vue({
           if (!curUse) {
             alert('请选择账号');
           }
-          const url = 'ws://192.168.0.103:8001';
+          const url = 'ws://:8001';
           // 创建连接，监听相关事件，处理 onmessage 接收信息
           _createWSconnection(url, (msg) => {
             const { from, file } = JSON.parse(msg);
-            const other = 0;
-            this.addFileMsg(from,file, msgType.OTHER);
+            this.addFileMsg(file);
           });
+          const isReal = true;
           // 创建录音实例
-          _createRecorderEntity();
+          _createRecorderEntity(isReal);
           _openRecorder();
           break;
         case 'start':

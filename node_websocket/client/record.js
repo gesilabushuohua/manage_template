@@ -44,7 +44,7 @@ let _audio = null;
 let _playFiles = [];
 
 // mp3 chunk数据会缓冲，当pcm的累积时长达到这个时长，就会传输发送。这个值在takeoffEncodeChunk实现下，使用0也不会有性能上的影响。
-let _sendInterval = 300;
+let _sendInterval = 1000;
 
 // 缓冲变量
 let _realTimeSendTryTime = 0;
@@ -66,11 +66,11 @@ function _createWSconnection(url, onMsg) {
     _ws = new WebSocket(url);
 
     // 传输方式改为arraybuffer
-   /*  _ws.binaryType = 'arraybuffer'; */
+    /*  _ws.binaryType = 'arraybuffer'; */
 
     _ws.onopen = function (e) {
       console.log('连接服务器成功');
-      const params = {use:curUse};
+      const params = { use: curUse };
       _ws.send(JSON.stringify(params));
     };
 
@@ -253,7 +253,7 @@ function _realTimeSendTry(chunkBytes, isClose) {
   // 上传数据
   _transferUpload(
     number,
-    chunkData,
+    blob,
     meta.duration || 0,
     {
       set: {
@@ -305,16 +305,27 @@ function _realTimeOnProcessClear(
 //=====数据传输函数==========
 function _transferUpload(
   number,
-  chunkData,
+  blob,
   duration,
   blobRec,
   isClose
 ) {
   _transferUploadNumberMax = Math.max(_transferUploadNumberMax, number);
-  if (chunkData) {
-    const buffer = chunkData.buffer;
-    console.log('send');
-    _ws.send(buffer);
+  if (blob) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const base64 = reader.result;
+      const params = {
+        from: curUse,
+        to: curSends,
+        file: base64,
+      };
+      const msg = JSON.stringify(params);
+      _wsSend(msg);
+    };
+    reader.readAsDataURL(blob);
+
+  
   }
 
   if (isClose) {
@@ -371,28 +382,36 @@ function _playAudio() {
 
 
 // 创建 recorder 实体
-function _createRecorderEntity() {
+function _createRecorderEntity(isReal) {
   if (_recorder !== null) {
     return;
   }
 
   //  注意：是数字的参数必须提供数字，不要用字符串；需要使用的type类型，需提前把格式支持文件加载进来，比如使用wav格式需要提前加载wav.js编码引擎
-  _recorder = Recorder({
+  const setting = {
     // mp3格式
     type: 'mp3',
     // 指定采样率hz
     sampleRate: 16000,
     // 比特率kbps，其他参数使用默认配置
     bitRate: 16,
-    // 录音实时回调，大约1秒调用12次本回调
-    /* onProcess: _onRecorderProcess,
+  };
 
-    // 将直接得到的 PCM 片段编码生成 mp3 数据
-    takeoffEncodeChunk: function (chunkBytes) {
-      //接管实时转码，推入实时处理
-      _realTimeSendTry(chunkBytes, false);
-    } */
-  });
+  if (isReal) {
+    Object.assign(setting, {
+      // 录音实时回调，大约1秒调用12次本回调
+      onProcess: _onRecorderProcess,
+
+      // 将直接得到的 PCM 片段编码生成 mp3 数据
+      takeoffEncodeChunk: function (chunkBytes) {
+        //接管实时转码，推入实时处理
+        _realTimeSendTry(chunkBytes, false);
+      }
+    });
+  }
+
+
+  _recorder = Recorder(setting);
 }
 
 // 监听录音实时回调

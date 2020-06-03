@@ -22,15 +22,17 @@ const server = ws.createServer(function (connection) {
 
   // 接收信息,类型 string
   connection.on('text', function (res) {
-    console.log('recevie text', res);
     const resObj = JSON.parse(res);
-    const { use, to } = resObj;
-    if (use){
+    const { use, from, to } = resObj;
+    
+    if (use) {
+      console.log('recevie text', use);
       connectionMap[use] = connection;
-    }else{
+    } else {
+      console.log('recevie text', from, to);
       broadcastText(to, res);
     }
-      
+
   });
 
   // 接受到二进制内容
@@ -55,13 +57,13 @@ const server = ws.createServer(function (connection) {
   // 关闭
   connection.on('close', function (code, reason) {
     console.log('close ws connection');
-    removeConnection(connection);  
+    removeConnection(connection);
   });
 
   // 异常
   connection.on('error', function (code, reason) {
     console.log('ws throw error');
-    removeConnection(connection); 
+    removeConnection(connection);
   });
 
 });
@@ -71,8 +73,8 @@ const server = ws.createServer(function (connection) {
   移除无效连接
 */
 function removeConnection(connection) {
-  for(const key in connectionMap){
-    if(connection === connectionMap[key]){
+  for (const key in connectionMap) {
+    if (connection === connectionMap[key]) {
       delete connectionMap[key];
       return;
     }
@@ -86,7 +88,7 @@ function broadcastText(senders, text) {
     if (connection) {
       console.log('broadcast');
       connection.sendText(text);
-    }else {
+    } else {
       console.log('no connection');
     }
   })

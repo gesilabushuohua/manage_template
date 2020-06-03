@@ -11,7 +11,7 @@
     <style type="text/css">
       .mes-box {
         width: 400px;
-        height: 500px;
+        height: 300px;
         border: 4px solid #ebebeb;
         border-radius: 4px;
         overflow-y: auto;
@@ -58,9 +58,9 @@
         </span>
       </div>
       <div class="mes-box">
-        <div class="msg" :class="{'other':item.type === 1}" v-for="(item,index) in fileMegs">
-          <p class="name">{{item.name}}</p>
-          <audio :src="item.url" controls>
+        <div class="msg">
+          <p class="name">{{from}}</p>
+          <audio ref="audio" :src="vedioURL" controls autoplay>
         </div>
       </div>
       <div class="tool" @click="soundRecordEvent">
