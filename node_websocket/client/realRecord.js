@@ -112,27 +112,6 @@ var app = new Vue({
           console.log('close');
           _recorder.close();
           break;
-        case 'play':
-          console.log('play');
-          const fileBytesList = _fileQueue.map((file) => {
-            let array = new Uint8Array(file);
-            return array;
-          });
-          // 合并成功
-          const successFn = function (fileBytes, duration, info) {
-            console.log('Mp3Merge successFn');
-            /*   const audio = document.createElement('audio');
-              audio.controls = true;
-              document.body.appendChild(audio);
-              const blob = new Blob([fileBytes]);
-              // 简单利用URL生成播放地址，注意不用了时需要revokeObjectURL，否则霸占内存
-              audio.src = (window.URL || webkitURL).createObjectURL(blob);
-              audio.play(); */
-          };
-          console.log('Mp3Merge');
-
-          _mp3Merge(fileBytesList, successFn);
-          break;
         default:
           break;
       }

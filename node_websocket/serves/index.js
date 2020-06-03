@@ -8,8 +8,10 @@ const ws = require('nodejs-websocket');
 
 console.log('start open websocket');
 
-
+// 链接集，用于 一对一，一对多聊天
 const connectionMap = {};
+
+// TODO　未发送消息集，监听到上线，发送消息
 
 // 创建连接
 const server = ws.createServer(function (connection) {
@@ -53,13 +55,13 @@ const server = ws.createServer(function (connection) {
   // 关闭
   connection.on('close', function (code, reason) {
     console.log('close ws connection');
-
+    removeConnection(connection);  
   });
 
   // 异常
   connection.on('error', function (code, reason) {
     console.log('ws throw error');
-    
+    removeConnection(connection); 
   });
 
 });
@@ -69,15 +71,23 @@ const server = ws.createServer(function (connection) {
   移除无效连接
 */
 function removeConnection(connection) {
-  
+  for(const key in connectionMap){
+    if(connection === connectionMap[key]){
+      delete connectionMap[key];
+      return;
+    }
+  }
 }
 
 // 广播消息, text
-function broadcastText(sender, text) {
-  server.connections.forEach(function (connection) {
-    if (sender !== connection) {
+function broadcastText(senders, text) {
+  senders.forEach(function (sender) {
+    const connection = connectionMap[sender];
+    if (connection) {
       console.log('broadcast');
       connection.sendText(text);
+    }else {
+      console.log('no connection');
     }
   })
 };
