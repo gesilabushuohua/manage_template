@@ -35,8 +35,8 @@
         margin: 5px;
       }
 
-      .tool .btn {
-        margin: 10px;
+      .tool-btn {
+        margin: 0px 2px;
         padding: 5px 18px;
         color: #fff;
         background-color: #f60;
@@ -63,11 +63,10 @@
           <audio :src="item.url" controls>
         </div>
       </div>
-      <div class="tool" @click="soundRecordEvent">
-        <span data-opt="online" class="btn">上线</span>
-        <span data-opt="start" class="btn">开始</span>
-        <span data-opt="stop" class="btn">结束</span>
-        <span data-opt="close" class="btn">关闭</span>
+      <div class="tool">
+        <span  class="tool-btn" @click="setLine">{{ lineBtn }}</span>
+        <span  class="tool-btn" @click="setLink">{{ linkBtn }}</span>
+        <span  class="tool-btn" @mousedown="startRecorder" @mouseup="stopRecorder">{{ recorderBtn }}</span>
       </div>
     </div>
 
@@ -88,7 +87,8 @@
   
 
     <!-- js -->
-    <script src="record.js"></script>
+    <script src="chat/soundRecord.js"></script>
+    <script src="chat/index.js"></script>
     <script src="recordmsg.js"></script>
   </body>
 </html>

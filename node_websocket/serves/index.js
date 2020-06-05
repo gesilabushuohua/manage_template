@@ -16,6 +16,8 @@ TODO
 5、对讲结束，销毁房间
 6、下线，移除链接
 
+TODO
+主持人模式，只允许主持人说话
 
 NOT TODO
 1、用户发送通话，在线空闲，建立房间，下发房间号，不在线返回 offline，据接 refuse
@@ -90,10 +92,11 @@ const server = ws.createServer(function (connection) {
 const SYSTEMTEXT = {
   offline: 0,
   online: 1,
-  inroom: 2,
-  outroom: 3,
-  destroyRoom: 4,
-  onchat: 5
+  createRoom:2,
+  inroom: 3,
+  outroom: 4,
+  destroyRoom: 5,
+  onchat: 6
 };
 
 // 接受客户端信息/文本
@@ -109,7 +112,7 @@ function onMessageText(res) {
     case SYSTEMTEXT.online:
       addConnection(from, connection);
       break;
-    case SYSTEMTEXT.inroom:
+    case SYSTEMTEXT.createRoom:
       createRoom(from, tos);
       break;
     case SYSTEMTEXT.outroom:
