@@ -14,23 +14,25 @@
 
 // TODO 主持人模式
 
-const Chat = (function(){
+var Chat = (function () {
   const chat = {};
 
   // 引入 sound
   const _sound = SoundRecord;
 
-  
-
   // 信息机制
-  let _isOnline = false;
-  let _isOnRoom = false;
+  
+  // TODO 语言通话
+  let _isReal = false;
   let _roomId = null;
   let _use = null;
-  let _onHandleVideoFn = null;
   let _url = null;
+
+  // 监听语言信息
   let _onVideoFn = null;
 
+  // 监听语音状态
+  let _onChatStatus = null;
 
   const SYSTEMTEXT = {
     offline: 0,
@@ -39,26 +41,23 @@ const Chat = (function(){
     inroom: 3,
     outroom: 4,
     destroyRoom: 5,
-    onchat: 6
-
+    onchat: 6,
   };
-
 
   // websocket 实例
   let _ws = null;
 
   // 初始化录音对话
-  chat._initRecordChat = function(url, onVideoFn) {
+  chat.initRecordChat = function (url, onVideoFn, onChatStatusFn) {
     _url = url;
     _onVideoFn = onVideoFn;
-  }
-
+    _onChatStatus = onChatStatusFn;
+  };
 
   // TODO 实时对话
 
-
   //===================发送、接受服务端信息=================
-  chat._createWS = function() {
+  chat.createWS = function () {
     if (window.WebSocket && _ws === null && _url) {
       _ws = new WebSocket(_url);
 
@@ -68,6 +67,11 @@ const Chat = (function(){
 
       _ws.onclose = function (e) {
         console.log('ws close');
+        if(_onChatStatus){
+          _onChatStatus(SYSTEMTEXT.outroom);
+          _onChatStatus(SYSTEMTEXT.offline);
+        }
+        
       };
 
       _ws.onerror = function () {
@@ -82,99 +86,101 @@ const Chat = (function(){
         }
       };
     }
-  }
+  };
 
-  _sendMessage = function(msgParams) {
+  _sendMessage = function (msgParams) {
     if (!_ws) {
       console.log('websocket object invalid');
     }
     _ws.send(JSON.stringify(msgParams));
-  }
-
+  };
 
   // 上线
-  chat._online = function(use) {
+  chat.online = function (use) {
     _use = use;
     const params = {
       command: SYSTEMTEXT.online,
-      from: use
+      from: use,
     };
     _sendMessage(params);
-  }
+  };
 
   // 离线
-  chat._offline = function() {
+  chat.offline = function () {
     const params = {
       command: SYSTEMTEXT.offline,
-      from: _use
+      from: _use,
     };
     _sendMessage(params);
-  }
+  };
 
   // 创建房间
-  chat._createRoom = function(tos) {
+  chat.createRoom = function (tos) {
     const params = {
       command: SYSTEMTEXT.createRoom,
       from: _use,
-      tos
+      tos,
     };
     _sendMessage(params);
-  }
+  };
 
   // 退出房间
-  chat._exitRoom = function() {
+  chat.exitRoom = function () {
     const params = {
       command: SYSTEMTEXT.outroom,
       from: _use,
-      roomId: _roomId
-    }
+      roomId: _roomId,
+    };
     _sendMessage(params);
-  }
+  };
 
   // 销毁房间
-  chat._destroyRoom = function() {
+  chat.destroyRoom = function () {
     const params = {
       command: SYSTEMTEXT.destroyRoom,
       from: _use,
-      roomId: _roomId
+      roomId: _roomId,
     };
     _sendMessage(params);
-  }
+  };
 
-  chat._getRoomStatus = function () {
-    return _isOnRoom;
-  }
+  
 
   // 聊天
-  function  _sendVideo(file) {
+  function _sendVideo(file) {
     const params = {
       command: SYSTEMTEXT.onchat,
       from: _use,
       roomId: _roomId,
-      file
+      file,
     };
     _sendMessage(params);
   }
-
-
 
   // 接收信息
   function _onMessage(msg) {
     const res = JSON.parse(msg);
     const { command, from } = res;
+    console.log('command', command);
+    if (_onChatStatus) {
+      _onChatStatus(command);
+    }
     switch (command) {
       case SYSTEMTEXT.online:
         _online = true;
         _use = from;
+        console.log('online');
         break;
       case SYSTEMTEXT.offline:
         _online = false;
         _use = null;
+        console.log('offline');
         break;
       case SYSTEMTEXT.createRoom:
         _isOnRoom = true;
         const { roomId } = res;
         _roomId = roomId;
+        console.log('createRoom ', roomId);
         break;
       case SYSTEMTEXT.inroom:
         console.log('connection use already in other room');
@@ -182,11 +188,14 @@ const Chat = (function(){
       case SYSTEMTEXT.outroom:
         _isOnRoom = false;
         _roomId = null;
+        console.log('outroom');
         break;
       case SYSTEMTEXT.destroyRoom:
         _roomId = null;
+        console.log('destroyRoom');
         break;
       case SYSTEMTEXT.onchat:
+        console.log('onchat');
         const { file } = res;
         if (file && _onVideoFn) {
           _onVideoFn(from, file);
@@ -195,57 +204,41 @@ const Chat = (function(){
       default:
         break;
     }
-  };
-
+  }
 
   //===============录音、实时语音、语音文件字节流处理，录音、实时语音不可共用同一实例====================
 
   // 创建录音实体
-  chat._createRecorder = function() {
+  chat.createRecorder = function () {
     _sound._createRecorderEntity();
-  }
+  };
 
   //TODO 创建实时语音实体
 
-
   // 开启录音权限
-  chat._openRecorder = _sound._openRecorder;
-
+  chat.openRecorder = _sound._openRecorder;
 
   // 开始录音/实时通话
-  chat._startRecorder = _sound._startRecorder;
-
+  chat.startRecorder = _sound._startRecorder;
 
   // 结束录音
-  chat._stopRecoder = function(getRecorderFileFn) {
+  chat.stopRecoder = function (getRecorderFileFn) {
     _sound._stopRecoder(function getRecorder(blob, duration) {
       console.log(`recorder ${duration}`);
       const reader = new FileReader();
       reader.onload = function (e) {
         console.log('recorder video');
         const base64 = reader.result;
-        
+
         // 发送语音
         _sendVideo(base64);
-        if(getRecorderFileFn){
+        if (getRecorderFileFn) {
           getRecorderFileFn(base64);
         }
       };
       reader.readAsDataURL(blob);
     });
-  }
-
-
-  // 结束实时通话
-  chat._stopReal = function() {
-    _sound._stopRecoder();
-  }
-
-  // 关闭录音权限
-  chat._closeRecorder = _sound._closeRecorder;
-
+  };
 
   return chat;
 })();
-
-

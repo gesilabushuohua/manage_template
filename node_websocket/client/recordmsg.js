@@ -8,11 +8,21 @@ let curSends = [];
 // type 1 自己信息, 0 其他人信息
 const msgType = {
   SELF: 1,
-  OTHER: 0
-}
+  OTHER: 0,
+};
+
+// 聊天状态
+const SYSTEMTEXT = {
+  offline: 0,
+  online: 1,
+  createRoom: 2,
+  inroom: 3,
+  outroom: 4,
+  destroyRoom: 5,
+  onchat: 6,
+};
 
 const chat = Chat;
-
 
 var app = new Vue({
   el: '#app',
@@ -26,8 +36,8 @@ var app = new Vue({
       fileMegs: [],
 
       isOnline: false,
-      isOnRoom: false,
-      isRecorder: false
+      isLink: false,
+      isRecorder: false,
     };
   },
   computed: {
@@ -38,17 +48,23 @@ var app = new Vue({
       return this.isLink ? '销毁' : '创建';
     },
     recorderBtn() {
-      return this.isRecorder ? '开始' : '结束';
-    }
+      return this.isRecorder ? '结束' : '开始';
+    },
   },
   mounted() {
     const url = 'ws://192.168.0.103:8001';
     const that = this;
-    chat._initRecordChat(url, function onVideoMessage(from, msg) {
-
-      that.addVideoFileMsg(msg, from, msgType.OTHER);
-    });
-    chat._createRecorder();
+    const onChatStatus = this.onChatStatus;
+    console.log(chat);
+    chat.initRecordChat(
+      url,
+      function onVideoMessage(from, msg) {
+        that.addVideoFileMsg(msg, from, msgType.OTHER);
+      },
+      onChatStatus
+    );
+    chat.createWS();
+    chat.createRecorder();
   },
   methods: {
     addVideoFileMsg(base64, name, type) {
@@ -56,11 +72,36 @@ var app = new Vue({
       const fileMsg = {
         name,
         url,
-        type
+        type,
       };
       this.fileMegs.push(fileMsg);
     },
 
+    // 监听状态
+    onChatStatus(command) {
+      switch (command) {
+        case SYSTEMTEXT.online:
+          this.isOnline = true;
+          break;
+        case SYSTEMTEXT.offline:
+          this.isOnline = false;
+          break;
+        case SYSTEMTEXT.createRoom:
+          this.isLink = true;
+          break;
+        case SYSTEMTEXT.inroom:
+          console.log('sends is occupy');
+          break;
+        case SYSTEMTEXT.outroom:
+          this.isLink = false;
+          break;
+        case SYSTEMTEXT.destroyRoom:
+          this.isLink = false;
+          break;
+        default:
+          break;
+      }
+    },
     getUse() {
       const doms = document.getElementsByClassName('use');
       for (let i = 0; i < doms.length; i++) {
@@ -85,18 +126,17 @@ var app = new Vue({
     },
 
     setLine() {
-      this.isOnline = !this.isOnline;
       if (this.isOnline) {
-        this.online();
-      } else {
         this.offline();
+      } else {
+        this.online();
       }
     },
     setLink() {
-      if (!this.isLink) {
-        this.createLink();
-      } else {
+      if (this.isLink) {
         this.destroyLink();
+      } else {
+        this.createLink();
       }
     },
 
@@ -106,9 +146,8 @@ var app = new Vue({
         console.log('no account');
         return;
       }
-      chat._openRecorder();
-      chat._createWS();
-      chat._online(curUse);
+      chat.openRecorder();
+      chat.online(curUse);
     },
 
     createLink() {
@@ -117,31 +156,29 @@ var app = new Vue({
         console.log('no select sends');
         return;
       }
-      chat._createRoom(curSends);
-      this.isLink = chat._getRoomStatus();
+      chat.createRoom(curSends);
     },
 
     destroyLink() {
-      this.isLink = false;
-      chat._destroyRoom();
+      chat.destroyRoom();
     },
 
     startRecorder() {
       this.isRecorder = true;
-      chat._startRecorder();
+      chat.startRecorder();
     },
 
     stopRecorder() {
       this.isRecorder = false;
       const that = this;
-      chat._stopRecoder(function getRcorder(fileBase64) {
+      chat.stopRecoder(function getRcorder(fileBase64) {
         that.addVideoFileMsg(fileBase64, curUse, msgType.SELF);
       });
     },
 
     offline() {
-      chat._offline();
+      chat.offline();
       this.isOnline = false;
-    }
+    },
   },
 });

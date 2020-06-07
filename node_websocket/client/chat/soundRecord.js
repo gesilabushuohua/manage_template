@@ -4,31 +4,15 @@
  * @Author: LB
  */
 
-
-const SoundRecord = (function () {
+var SoundRecord = (function () {
   const sound = {};
 
   // 录音实例
-  sound._recorder = null;
-
-  // mp3 chunk数据会缓冲，当pcm的累积时长达到这个时长，就会传输发送。这个值在takeoffEncodeChunk实现下，使用0也不会有性能上的影响。
-  let _sendInterval = 1000;
-
-  // 缓冲变量
-  let _realTimeSendTryTime = 0;
-  let _realTimeSendTryNumber;
-  let _transferUploadNumberMax;
-  let _realTimeSendTryBytesChunks;
-  let _realTimeSendTryClearPrevBufferIdx;
-  let _realTimeSendTryWavTestBuffers;
-  let _realTimeSendTryWavTestSampleRate;
-
-  // 文件片段间隔
-  const space = 20;
+  _recorder = null;
 
 
 
-  // TODO 
+  // TODO
   // 创建 recorder 实体
   sound._createRecorderEntity = function (isReal) {
     if (_recorder !== null) {
@@ -42,7 +26,7 @@ const SoundRecord = (function () {
       // 指定采样率hz
       sampleRate: 16000,
       // 比特率kbps，其他参数使用默认配置
-      bitRate: 16
+      bitRate: 16,
     };
 
     if (isReal) {
@@ -54,13 +38,42 @@ const SoundRecord = (function () {
         takeoffEncodeChunk: function (chunkBytes) {
           //接管实时转码，推入实时处理
           _realTimeSendTry(chunkBytes, false);
-        }
+        },
       });
     }
 
-
     _recorder = Recorder(setting);
-  }
+  };
+
+  sound._openRecorder = function () {
+    _recorder.open(
+      function success() {
+        console.log('open success');
+      },
+      function fail() {
+        console.log('open fail');
+      }
+    );
+  };
+
+  sound._startRecorder = function () {
+    _recorder.start();
+  };
+
+  sound._stopRecoder = function (fn) {
+    _recorder.stop(
+      function success(blob, duration) {
+        fn(blob, duration);
+      },
+      function fail(msg) {
+        console.log('recorder fail', msg);
+      }
+    );
+  };
+
+  sound._closeRecorder = function () {
+    _recorder.close();
+  };
 
   //重置环境
   _realTimeSendTryReset = function () {
@@ -68,125 +81,6 @@ const SoundRecord = (function () {
   };
 
 
-
-  //=====实时处理核心函数==========
-  function _realTimeSendTry(chunkBytes, isClose) {
-    if (chunkBytes) {
-      //推入缓冲再说
-      _realTimeSendTryBytesChunks.push(chunkBytes);
-    }
-
-    let t1 = Date.now();
-    if (!isClose && t1 - _realTimeSendTryTime < _sendInterval) {
-      return; //控制缓冲达到指定间隔才进行传输
-    }
-    _realTimeSendTryTime = t1;
-    let number = ++_realTimeSendTryNumber;
-
-    // mp3缓冲的chunk拼接成一个更长点的mp3
-    let len = 0;
-    for (let i = 0; i < _realTimeSendTryBytesChunks.length; i++) {
-      len += _realTimeSendTryBytesChunks[i].length;
-    }
-    let chunkData = new Uint8Array(len);
-    for (let i = 0, idx = 0; i < _realTimeSendTryBytesChunks.length; i++) {
-      let chunk = _realTimeSendTryBytesChunks[i];
-      chunkData.set(chunk, idx);
-      idx += chunk.length;
-    }
-    _realTimeSendTryBytesChunks = [];
-    //推入传输
-    let blob = null,
-      meta = {};
-    if (chunkData.length > 0) {
-      //mp3不是空的
-      blob = new Blob([chunkData], { type: 'audio/mp3' });
-      meta =
-        Recorder.mp3ReadMeta([chunkData.buffer], chunkData.length) || {}; //读取出这个mp3片段信息
-    }
-
-    // 上传数据
-    _transferUpload(
-      number,
-      blob,
-      meta.duration || 0,
-      {
-        set: {
-          type: 'mp3',
-          sampleRate: meta.sampleRate,
-          bitRate: meta.bitRate
-        }
-      },
-      isClose
-    );
-
-
-    _realTimeSendTryWavTestBuffers = [];
-  };
-
-  //=====实时处理时清理一下内存（延迟清理），本方法先于RealTimeSendTry执行======
-  function _realTimeOnProcessClear(
-    buffers,
-    powerLevel,
-    bufferDuration,
-    bufferSampleRate,
-    newBufferIdx,
-    asyncEnd
-  ) {
-    if (_realTimeSendTryTime == 0) {
-      _realTimeSendTryTime = Date.now();
-      _realTimeSendTryNumber = 0;
-      _transferUploadNumberMax = 0;
-      _realTimeSendTryBytesChunks = [];
-      _realTimeSendTryClearPrevBufferIdx = 0;
-      _realTimeSendTryWavTestBuffers = [];
-      _realTimeSendTryWavTestSampleRate = 0;
-    }
-
-    //清理PCM缓冲数据，最后完成录音时不能调用stop，因为数据已经被清掉了
-    //这里进行了延迟操作（必须要的操作），只清理上次到现在的buffer
-    for (let i = _realTimeSendTryClearPrevBufferIdx; i < newBufferIdx; i++) {
-      buffers[i] = null;
-    }
-    _realTimeSendTryClearPrevBufferIdx = newBufferIdx;
-
-    //备份一下方便后面生成测试wav
-    for (let i = newBufferIdx; i < buffers.length; i++) {
-      _realTimeSendTryWavTestBuffers.push(buffers[i]);
-    }
-    _realTimeSendTryWavTestSampleRate = bufferSampleRate;
-  };
-
-  //=====数据传输函数==========
-  function _transferUpload(
-    number,
-    blob,
-    duration,
-    blobRec,
-    isClose
-  ) {
-    _transferUploadNumberMax = Math.max(_transferUploadNumberMax, number);
-    if (blob) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const base64 = reader.result;
-        const params = {
-          from: curUse,
-          to: curSends,
-          file: base64,
-        };
-        const msg = JSON.stringify(params);
-        /*   _wsSend(msg); */
-      };
-      reader.readAsDataURL(blob);
-
-
-    }
-
-    if (isClose) {
-      console.log('No.' + (number < 100 ? ('000' + number).substr(-3) : number) + ':已停止传输');
-    }
-  };
 
   // 监听录音实时回调
   function _onRecorderProcess(
@@ -198,18 +92,18 @@ const SoundRecord = (function () {
     newBufferIdx,
     asyncEnd
   ) {
-    _realTimeOnProcessClear(
+  /*   _realTimeOnProcessClear(
       buffers,
       powerLevel,
       bufferDuration,
       bufferSampleRate,
       newBufferIdx,
       asyncEnd
-    );
+    ); */
   }
 
   // 打开麦克风，获取权限
-  sound._openRecorder = function() {
+  sound._openRecorder = function () {
     _recorder.open(
       function sucess() {
         console.log('open sucess');
@@ -218,27 +112,24 @@ const SoundRecord = (function () {
         console.log('open fail');
       }
     );
-  }
+  };
 
   // 开始录音/实时通话
-  sound._startRecorder = function() {
+  sound._startRecorder = function () {
     _recorder.start();
-  }
+  };
 
   // 关闭录音/实时通话
-  sound._stopRecorder = function() {
-    _recorder.stop(getRecorderFn,
-      function fail(msg) {
-        console.log('get recorder fail', msg);
-      });
-  }
+  sound._stopRecorder = function () {
+    _recorder.stop(getRecorderFn, function fail(msg) {
+      console.log('get recorder fail', msg);
+    });
+  };
 
   // 关闭麦克风权限
-  sound._closeRecorder = function(){
+  sound._closeRecorder = function () {
     _recorder.close();
-  }
+  };
 
-
-
-
+  return sound;
 })();
