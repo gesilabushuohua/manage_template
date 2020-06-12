@@ -61,3 +61,6 @@ export const generateAuthentication = (url, str) => {
 
   return authorization;
 };
+
+
+// 下载文件

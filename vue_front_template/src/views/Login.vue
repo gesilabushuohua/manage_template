@@ -167,7 +167,7 @@ export default {
   min-width: 600px;
   min-height: 624px;
   background: url('../assets/images/bg6.jpg') no-repeat fixed;
-  background-size: 100% auto;
+  background-size: 100% 100%;
   padding: 1px;
   box-sizing: border-box;
 }

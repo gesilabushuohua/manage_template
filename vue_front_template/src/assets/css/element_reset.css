@@ -1,0 +1,9 @@
+.el-input__prefix{
+  margin-right: 5px;
+  font-size: 20px;
+}
+
+.el-dialog__header{
+  padding: 5px 20px;
+  border-bottom: 1px solid #ebebeb; 
+}

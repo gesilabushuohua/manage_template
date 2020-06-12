@@ -1,0 +1,15 @@
+/* 页面标签 */
+.page-tag{
+  margin: 5px 0; 
+  height: 30px;
+  font-size: 18px;
+  font-weight: bolder;
+  line-height: 30px;
+  padding-left: 10px;
+  border-left: 3px solid #3c80ff;
+}
+
+/* 操作按钮栏 */
+.opt-btns{
+ margin: 5px 0;
+}

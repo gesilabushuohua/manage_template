@@ -7,13 +7,12 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 const Login = () => import('@/views/Login.vue');
-const Layout = () => import('@/views/Layout.vue');
+const SideLayout = () => import('@/views/SideLayout.vue');
+const TopLayout = () => import('@/views/TopLayout.vue');
 const About = () => import('@/views/About.vue');
 const Home = () => import('@/views/Home.vue');
-const TableBuilderEle = () => import('@/views/builder/TableBuilderEle.vue');
-const FormTemplateEle = () => import('@/views/template/FormTemplateEle.vue');
-const TableTemplateEle = () => import('@/views/template/TableTemplateEle.vue');
-const TableTemplateEleDom = () => import('@/views/TableTemplateDom.vue');
+const BaseTable = () => import('@/views/BaseTable.vue');
+
 
 Vue.use(VueRouter);
 
@@ -24,36 +23,33 @@ const routes = [
     component: Login
   },
   {
-    path: '/home',
-    name: 'home',
-    component: Layout,
+    path: '/side',
+    name: 'side',
+    component: SideLayout,
     children: [
       {
-        path: '/tableDom',
-        name: 'TableTemplateEleDom',
-        component: TableTemplateEleDom
-      },
-      {
-        path: '/h2',
-        name: 'h2',
-        component: Home
+        path: 'table',
+        name: 'table',
+        component: BaseTable
       }
     ]
   },
   {
-    path: '/tableBuilderEle',
-    name: 'tableBuilderEle',
-    component: TableBuilderEle
-  },
-  {
-    path: '/formTemEle',
-    name: 'FormTemplateEle',
-    component: FormTemplateEle
-  },
-  {
-    path: '/tableTemEle',
-    name: 'TableTemplateEle',
-    component: TableTemplateEle
+    path: '/top',
+    name: 'top',
+    component: TopLayout,
+    children: [
+      {
+        path: 'home',
+        name: 'Home',
+        component: Home
+      },
+      {
+        path: 'h2',
+        name: 'h2',
+        component: Home
+      }
+    ]
   }
 ];
 
