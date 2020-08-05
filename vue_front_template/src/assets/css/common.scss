@@ -1,0 +1,140 @@
+/* ==================布局样式 ======================*/
+@import '@/assets/css/common_variable.scss';
+
+
+
+
+/* 水平布局样式 */
+.horizontal-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+
+  > .section {
+    margin-right: 5px;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  > .main {
+    flex: 1;
+    overflow-x: hidden;
+  }
+}
+
+/* 垂直布局样式 */
+.vertical-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  > .section {
+    user-select: none;
+  }
+
+  > .main {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* 菜单 */
+.side-menu,.top-menu {
+  position: relative;
+  background: $menu-bg-color;
+  color: $menu-font-color;
+  font-size: $menu-font-size;
+}
+
+.top-menu {
+  display: flex;
+  padding: 0 15px;
+}
+
+/* 菜单后缀图标 */
+.menu-item .suffix-icon{
+  line-height: $menu-item-height;
+  font-size: $menu-icon-size;
+  transition: all 0.4s;
+}
+
+.system-title {
+  font-size: $system-title-font-size;
+  font-weight: $system-title-font-weight;
+}
+
+/* 占满父级高度 */
+.fill-height {
+  height: 100%;
+}
+
+.wapper-padding {
+  padding: 5px 10px;
+  box-sizing: border-box;
+}
+
+/* 占位 */
+.placeholder-w-200{
+  width: 200px;
+}
+
+/* 间隔 */
+.gap{
+  margin-bottom: 5px;
+}
+
+/* 标签 */
+.label {
+  display: block;
+  margin-right: 5px;
+  width: $label-width;
+  line-height: $label-height;
+  font-size: $normal-font-size;
+  color: $normal-font-color;
+}
+
+
+/* 页面标签 */
+.page-tag {
+  margin: 0 0 5px;
+  padding-left: 10px;
+  height: $page-tag-height;
+  line-height: $page-tag-height;
+  font-size: $page-tag-font-size;
+  font-weight: bolder;
+  border-left: $hight-light-border;
+}
+
+.page-bottom{
+  padding-top: 10px;
+  height: $page-bottom-height;
+  text-align: center;
+}
+
+
+/* 操作按钮栏 */
+.opt-btns {
+  margin: 0 5px;
+}
+
+/* 检索模块 */
+.simply-query {
+  display: inline-block;
+}
+
+.simply-query .item {
+  display: flex;
+  margin-right: 10px;
+  width: $simply-query-item-width;
+}
+
+
+
+/* 无数据信息提示 */
+.no-data-msg {
+  width: 100%;
+  height: 100%;
+  background-image: url('~@/assets/images/no-data.png');
+  background-position: center;
+  background-repeat: no-repeat;
+}

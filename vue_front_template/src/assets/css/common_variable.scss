@@ -1,0 +1,40 @@
+/* common color */
+$primary-color: teal !default;
+$hight-light-border: 3px solid $primary-color;
+
+/* common font color */
+$primary-font-color: #303133 !default;
+$normal-font-color: #606266 !default;
+$normal-font-size: 14px !default;
+
+/* common */
+$body-bg-color: #ebebeb !default;
+$content-bg-color: #fff !default;
+
+/* system   */
+$system-title-font-size: 18px;
+$system-title-font-weight: bolder;
+
+/* menu 菜单样式*/
+$horizontal-menu-width: 180px !default;
+$veritical-menu-height: 50px !default;
+$menu-bg-color: #2d2d2d !default;
+$menu-font-color: #fff !default;
+$menu-font-size: 16px;
+$menu-item-height: 50px !default;
+$menu-icon-size: 20px !default;
+
+
+/* label 标签样式 */
+$label-width: 60px;
+$label-height: 32px;
+
+/* page-tag 页面标题*/
+$page-tag-height: 30px !default;
+$page-tag-font-size: 18px;
+
+/* page-botton 页面底部 */
+$page-bottom-height: 30px !default;
+
+/* query 检索栏 */
+$simply-query-item-width: 250px;
