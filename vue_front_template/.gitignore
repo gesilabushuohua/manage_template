@@ -6,6 +6,7 @@ node_modules
 public
 src/assets/js/map_load.js
 src/assets/js/map_load_offline.js
+*.bak
 
 # local env files
 .env.local
