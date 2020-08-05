@@ -1,81 +1,46 @@
 <!--
- * @Description: 侧边布局首页
+ * @Description: 侧边导航菜单实例
  * @Date: 2020-01-03 17:45:59
  * @Author: LB
 --> 
 <template>
-  <left-main-layout
-    left-style="background-color:#333;color:#fff;"
-    main-style="padding:8px 10px;"
-  >
-    <template v-slot:left>
+  <div class="horizontal-layout">
+    <section class="left section side-menu">
+      <div class="logo">
+        <span class="system-title">MANAGE</span>
+      </div>
       <side-menu :menus="menus" />
       <account account-style="left:25px;bottom:0px;color:#fff;" />
-    </template>
-    <template v-slot:main>
+    </section>
+    <main class="main">
       <router-view />
-    </template>
-  </left-main-layout>
+    </main>
+  </div>
 </template>
 
 <script>
-import LeftMainLayout from '@/layout/LeftMainLayout';
-import SideMenu from '@/layout/components/SideMenu';
-import Account from '@/layout/components/Account';
+import SideMenu from '@/layout/components/SideMenu.vue';
+import Account from '@/layout/components/Account.vue';
+import { sideMenus } from '@/config/menus.js';
 
 export default {
   name: 'Layout',
   components: {
-    LeftMainLayout,
     SideMenu,
     Account
   },
   props: {},
   data() {
     return {
-      menus: [
-        {
-          cName: '首页',
-          path: '/side/home'
-        },
-        {
-          cName: '系统管理',
-          children: [
-            {
-              cName: '表格',
-              path: '/side/table'
-            },
-            {
-              cName: '表格',
-              path: '/h2'
-            }
-          ]
-        }
-      ]
+      menus: sideMenus
     };
-  },
-  computed: {},
-  watch: {},
-  created() {},
-  mounted() {},
-  methods: {}
+  }
 };
 </script>
 <style lang="scss" scoped>
 .logo {
-  display: flex;
+  margin-top: 10px;
   align-items: center;
-
-  > img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .title {
-    margin-left: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-  }
+  text-align: center;
 }
 </style>

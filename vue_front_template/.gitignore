@@ -2,6 +2,11 @@
 node_modules
 /dist
 
+# myself
+public
+src/assets/js/map_load.js
+src/assets/js/map_load_offline.js
+
 # local env files
 .env.local
 .env.*.local

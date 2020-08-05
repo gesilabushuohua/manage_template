@@ -131,9 +131,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/assets/css/common_variable.scss';
 $width: 120px;
 $height: 40px;
-$actived-color: #3c80ff;
+
 .account {
   position: absolute;
   display: flex;
@@ -164,7 +165,7 @@ $actived-color: #3c80ff;
   }
 
   .icon:hover {
-    color: $actived-color;
+    color: $primary-color;
   }
 }
 </style>

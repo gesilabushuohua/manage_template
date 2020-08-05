@@ -40,9 +40,8 @@
 
 <script>
 
-/* import { basicLogin, digestLogin, getCode, digestLoginURL } from '@/api/index'; */
+import { BasicLogin, DigestLogin, GetCode } from '@/api/common/services.js';
 import { generateAuthentication } from '@/utils/index.js';
-
 export default {
   name: 'Login',
   components: {},
@@ -57,8 +56,8 @@ export default {
       },
       rules: {
         account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
-        password: [{ require: true, message: '请输入密码', trigger: 'blur' }],
-        captcha: [{ require: true, message: '请输入验证码', trigger: 'blur' }]
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
       }
     };
   },
@@ -86,13 +85,9 @@ export default {
     basicLogin() {
       const params = { ...this.from };
       this.isLoging = true;
-      new Promise(params)
+      BasicLogin(params)
         .then(res => {
-          console.log({ res, params });
-          const { code } = res;
-          if (code === 0) {
-            this.$router.push('/home');
-          }
+          this.$router.push('/home');
         })
         .finally(() => {
           this.isLoging = false;
@@ -118,13 +113,9 @@ export default {
       sessionStorage.setItem('Authorization', Authorization);
 
       // 结合验证码，登录
-      new Promise({ captcha: param.captcha })
+      DigestLogin({ captcha: param.captcha })
         .then(res => {
-          console.log({ res });
-          const { code } = res;
-          if (code === 0) {
-            this.$router.push('/home');
-          }
+          this.$router.push('/home');
         })
         .catch(e => {
           const response = e.response || null;
@@ -145,7 +136,7 @@ export default {
         });
         return;
       }
-      new Promise(account)
+      GetCode(account)
         .then(res => {
           console.log('get code image file steam', { res });
         })

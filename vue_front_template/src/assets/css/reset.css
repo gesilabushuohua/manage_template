@@ -28,14 +28,14 @@ ul {
   /*滚动条里面小方块*/
   border-radius: 3px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  background: #005983;
+  background: teal;
 }
 
 ::-webkit-scrollbar-track {
   /*滚动条里面轨道*/
-  box-shadow: inset 0 0 5px #005983;
+  box-shadow: inset 0 0 5px teal;
   border-radius: 2px;
-  background: rgba(#005983, 0.3);
+  background: rgba(teal, 0.3);
 }
 
 ::-webkit-scrollbar-button {
@@ -43,13 +43,3 @@ ul {
   height: 3px;
 }
 
-#search-car .el-checkbox__label {
-  padding-left: 2px;
-}
-footer .el-select--small {
-  height: 22px;
-}
-footer .el-input--small .el-input__inner {
-  height: 22px !important;
-  line-height: 22px !important;
-}

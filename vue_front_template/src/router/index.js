@@ -10,8 +10,17 @@ const Login = () => import('@/views/Login.vue');
 const SideLayout = () => import('@/views/SideLayout.vue');
 const TopLayout = () => import('@/views/TopLayout.vue');
 const About = () => import('@/views/About.vue');
-const Home = () => import('@/views/Home.vue');
 const BaseTable = () => import('@/views/BaseTable.vue');
+const BaseRollDetail = () => import('@/views/BaseRollDetail.vue');
+const BaseTree = () => import('@/views/BaseTree.vue');
+const BaseMap = () => import('@/views/BaseMap.vue');
+
+const LoginForm = () => import('@/views/form/LoginForm.vue');
+const ModifyPwdForm = () => import('@/views/form/ModifyPwdForm.vue');
+const BasicForm = () => import('@/views/form/BasicForm.vue');
+
+const Page404 = () => import('@/views/404.vue');
+
 
 
 Vue.use(VueRouter);
@@ -28,9 +37,44 @@ const routes = [
     component: SideLayout,
     children: [
       {
+        path: 'loginForm',
+        name: 'sideLoginForm',
+        component: LoginForm
+      },
+      {
+        path: 'modifyPwdForm',
+        name: 'sideModifyPwdForm',
+        component: ModifyPwdForm
+      },
+      {
+        path: 'baseForm',
+        name: 'sideBasicForm',
+        component: BasicForm
+      },
+      {
         path: 'table',
-        name: 'table',
+        name: 'sidetable',
         component: BaseTable
+      },
+      {
+        path: 'rollDetail',
+        name: 'sideBaseRollDetail',
+        component: BaseRollDetail
+      },
+      {
+        path: 'tree',
+        name: 'sideTree',
+        component: BaseTree
+      },
+      {
+        path: 'map',
+        name: 'sideMap',
+        component: BaseMap
+      },
+      {
+        path: '*',
+        name: 'side404',
+        component: Page404
       }
     ]
   },
@@ -40,16 +84,51 @@ const routes = [
     component: TopLayout,
     children: [
       {
-        path: 'home',
-        name: 'Home',
-        component: Home
+        path: 'loginForm',
+        name: 'topLoginForm',
+        component: LoginForm
       },
       {
-        path: 'h2',
-        name: 'h2',
-        component: Home
+        path: 'modifyPwdForm',
+        name: 'topModifyPwdForm',
+        component: ModifyPwdForm
+      },
+      {
+        path: 'baseForm',
+        name: 'topBasicForm',
+        component: BasicForm
+      },
+      {
+        path: 'table',
+        name: 'toptable',
+        component: BaseTable
+      },
+      {
+        path: 'rollDetail',
+        name: 'topBaseRollDetail',
+        component: BaseRollDetail
+      },
+      {
+        path: 'tree',
+        name: 'topTree',
+        component: BaseTree
+      },
+      {
+        path: 'map',
+        name: 'topMap',
+        component: BaseMap
+      },
+      {
+        path: '*',
+        name: 'top404',
+        component: Page404
       }
     ]
+  },
+  {
+    path: '*',
+    name: '404',
+    component: Page404
   }
 ];
 

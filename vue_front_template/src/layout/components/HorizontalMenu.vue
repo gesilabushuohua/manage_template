@@ -21,13 +21,20 @@
       v-for="(menu,index) in menus"
       :id="menu.path"
       :key="index"
-      class="menu"
+      class="menu-item"
       :data-path="menu.path"
       :data-is-leaf="!hasMenuChild(menu)"
     >
-      <span class="text" :data-path="menu.path" :data-is-leaf="!hasMenuChild(menu)">{{ menu.cName }}</span>
-      <span v-show="hasMenuChild(menu)" class="icon el-icon-arrow-down"></span>
-      <ul v-if="hasMenuChild(menu)" class="subMenu">
+      <span>
+        <span
+          class="text"
+          :data-path="menu.path"
+          :data-is-leaf="!hasMenuChild(menu)"
+        >{{ menu.cName }}</span>
+        <span v-show="hasMenuChild(menu)" class="suffix-icon el-icon-arrow-down"></span>
+      </span>
+
+      <ul v-if="hasMenuChild(menu)" class="sub-menu">
         <li
           v-for="(subMenu,subi) in menu.children"
           :id="subMenu.path"
@@ -56,17 +63,14 @@ export default {
   data() {
     return {};
   },
-  computed: {},
-  watch: {},
-  created() {},
   mounted() {
     this.initMenuActive();
   },
   methods: {
-
     /* 
     @function 判断 munu 是否有子菜单
     */
+
     hasMenuChild(menu) {
       return menu.children && menu.children.length > 0;
     },
@@ -74,14 +78,14 @@ export default {
     initMenuActive() {
       const { path } = this.$route;
       const menu = document.getElementById(path);
-      this.handleActivedMenu(menu);
+      this.toggleMenuActiveClass(menu);
     },
 
     /* 
     @function 为菜单添加样式，移除样式
     @param 添加样式 dom 节点
     */
-    handleActivedMenu(menu) {
+    toggleMenuActiveClass(menu) {
       if (!menu) {
         return;
       }
@@ -104,78 +108,88 @@ export default {
       const lastMenu = document.getElementById(lastPath);
       this.$router.push(path);
 
-      //  移除之前菜单激活样式  
-      this.handleActivedMenu(lastMenu);
+      //  移除之前菜单激活样式
+      this.toggleMenuActiveClass(lastMenu);
 
       //  添加当前菜单激活样式
-      this.handleActivedMenu(menu);
+      this.toggleMenuActiveClass(menu);
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-$actived-color: #3c80ff;
-$font-color: #fff;
+@import '@/assets/css/common_variable.scss';
+
+$menu-padding-gap: 10px;
+$sub-menu-width: 100px;
 
 .menus {
   position: relative;
   display: flex;
   margin: 0;
+  height: $veritical-menu-height;
   list-style: none;
-  font-size: 14px;
-  color: $font-color;
+}
 
-  .menu {
+.menu-item {
+  position: relative;
+  z-index: 999;
+  display: block;
+  padding: 0 $menu-padding-gap;
+  width: $sub-menu-width;
+  font-weight: normal;
+  text-align: center;
+  line-height: $menu-item-height;
+  border-bottom: 4px solid transparent;
+
+  > .text {
+    margin-right: 10px;
+  }
+
+  .suffix-icon {
+    position: absolute;
+    right: -2px;
+  }
+
+  .sub-menu {
+    display: none;
+  /*   margin-left: -$menu-padding-gap; */
+    width: $sub-menu-width;
+    list-style: none;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #ebeef5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.4s;
+
+    >li{
+       padding: 0 $menu-padding-gap;
+    }
+
+    .actived {
+      color: $primary-color;
+    }
+  }
+}
+
+.menu-item:hover {
+  > .icon {
+    transform: rotate(-180deg);
+  }
+
+  .sub-menu {
     display: block;
-    width: 100px;
-    text-align: center;
-    line-height: 50px;
-    border-bottom: 4px solid transparent;
 
-    > .text {
-      margin-right: 10px;
-    }
-
-    > .icon {
-      transition: all 0.4s;
-    }
-
-    .subMenu {
-      display: none;
-      margin-top: 5px;
-      padding: 0;
-      list-style: none;
-      color: #000;
-      background-color: #fff;
-      border: 1px solid #ebeef5;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      transition: all 0.4s;
-
-      .actived {
-        color: $actived-color;
-      }
+    > li:hover {
+      cursor: pointer;
+      color: $primary-color;
+      background: rgba($primary-color, 0.2);
     }
   }
+}
 
-  .menu:hover {
-    > .icon {
-      transform: rotate(-180deg);
-    }
-
-    .subMenu {
-      display: block;
-
-      > li:hover {
-        cursor: pointer;
-        background-color: regba($actived-color, 0.2);
-      }
-    }
-  }
-
-  .actived {
-    font-weight: bold;
-    border-bottom-color: $actived-color;
-    color: $actived-color;
-  }
+.actived{
+  border-bottom-color: $primary-color;
+  color: $primary-color;
 }
 </style>

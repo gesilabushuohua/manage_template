@@ -15,25 +15,24 @@
   ]
  */
 <template>
-  <ul class="menu menus">
+  <ul class="menus">
     <li v-for="(menu,index) in menus" :key="index">
-      <p
+      <span
         :id="menu.path"
         class="menu-item"
         :data-is-leaf="!hasChildren(menu)"
         @click="handleMenuClick"
       >
         <span>{{ menu.cName }}</span>
-        <span v-show="hasChildren(menu)" class="icon el-icon-arrow-right"></span>
-      </p>
+        <span v-show="hasChildren(menu)" class="suffix-icon el-icon-arrow-right"></span>
+      </span>
 
-      <ul v-if="hasChildren(menu)" class="menu sub-menu">
+      <ul v-if="hasChildren(menu)" class="sub-menu">
         <li
           v-for="(sub,subi) in menu.children"
           :id="sub.path"
           :key="index+'-'+subi"
           class="menu-item"
-          data-is-leaf="true"
           data-has-parent="true"
           @click="handleMenuClick"
         >{{ sub.cName }}</li>
@@ -46,6 +45,7 @@
 const menuClassName = 'menu-item';
 const menuActivedClassName = 'actived';
 const menuOpenClassName = 'open';
+
 export default {
   name: 'SizeMenu',
   props: {
@@ -57,14 +57,10 @@ export default {
   data() {
     return {};
   },
-  computed: {},
-  watch: {},
-  created() {},
   mounted() {
     this.initMenu();
   },
   methods: {
-
     //  判断是否拥有子级
     hasChildren(menu) {
       return menu.children && menu.children.length > 0;
@@ -76,8 +72,12 @@ export default {
     initMenu() {
       const { path } = this.$route;
       const curMenuDom = document.getElementById(path);
+      if (!curMenuDom) {
+        return;
+      }
+
       const {
-        dataset: { hasParent, isLeaf }
+        dataset: { hasParent }
       } = curMenuDom;
 
       //  存在父级,菜单在二级,展开一级，显示二级菜单
@@ -85,9 +85,9 @@ export default {
         const parent = curMenuDom.parentElement.parentElement;
         parent.classList.toggle(menuOpenClassName);
       }
-      
+
       //  添加菜单激活样式
-      this.handleMenuActiveClass(curMenuDom);
+      this.toggleMenuActiveClass(curMenuDom);
     },
 
     /* 
@@ -100,6 +100,7 @@ export default {
         curMenuDom = curMenuDom.parentElement;
       }
       const { path: lastPath } = this.$route;
+
       const {
         id: path,
         dataset: { hasParent, isLeaf }
@@ -118,10 +119,10 @@ export default {
         const lastMenuDom = document.getElementById(lastPath);
 
         //  移除旧菜单激活样式
-        this.handleMenuActiveClass(lastMenuDom);
+        this.toggleMenuActiveClass(lastMenuDom);
 
         //  添加新菜单激活样式
-        this.handleMenuActiveClass(curMenuDom);
+        this.toggleMenuActiveClass(curMenuDom);
         this.$router.push(path);
       }
     },
@@ -129,11 +130,11 @@ export default {
     /*
     @function 添加|移除菜单激活样式
      */
-    handleMenuActiveClass(dom) {
+    toggleMenuActiveClass(dom) {
       if (!dom) {
         return;
       }
-      const { hasParent, isLeaf } = dom.dataset;
+      const { hasParent } = dom.dataset;
 
       //  拥有父级，操作父级样式
       if (hasParent) {
@@ -148,67 +149,63 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-$actived-color: #3c80ff;
-$height: 40px;
-
-.menu {
-  padding: 0;
-  list-style: none;
-
-  .menu-item {
-    position: relative;
-    padding: 5px 10px;
-    height: $height;
-    line-height: $height;
-    cursor: pointer;
-    border-right: 4px solid transparent;
-  }
-
-  .menu-item:hover {
-    background: rgba($actived-color, 0.2);
-  }
-}
+@import '@/assets/css/common_variable.scss';
 
 .menus {
-  margin: 20px 0;
+  margin: 10px 0;
+  padding: 0;
+  width: $horizontal-menu-width;
+  list-style: none;
 
-  /* 点击菜单激活后 */
-  > li > .actived {
-    border-right: 4px solid $actived-color !important;
-    background: rgba($actived-color, 0.2);
-  }
-
-  > li {
-    .icon {
-      position: absolute;
-      top: 32%;
-      right: 20px;
-      transition: all 0.4s;
-    }
-
-    .sub-menu {
-      display: none;
-    }
-  }
-
-  .open {
-    /* 打开菜单 */
-    .icon {
-      transform: rotate(90deg);
-    }
-    .sub-menu {
-      display: block;
-    }
+  /* 激活样式 */
+  > li .actived {
+    border-right: 4px solid $primary-color !important;
+    background: rgba($primary-color, 0.2);
   }
 }
 
+/* 子菜单 */
 .sub-menu {
+  display: none;
+
   .menu-item {
     padding-left: 20px;
   }
 
   > .actived {
-    color: $actived-color;
+    color: $primary-color;
   }
+}
+
+/* 父级菜单 展开样式 */
+.open {
+  .suffix-icon {
+    transform: rotate(90deg);
+  }
+  .sub-menu {
+    display: block;
+  }
+}
+
+/* 菜单项 */
+.menu-item {
+  display: block;
+  position: relative;
+  padding: 0 10px;
+  height: $menu-item-height;
+  line-height: $menu-item-height;
+  cursor: pointer;
+  border-right: 4px solid transparent;
+
+  .suffix-icon {
+    position: absolute;
+    right: 20px;
+    line-height: $menu-item-height;
+    transition: all 0.4s;
+  }
+}
+
+.menu-item:hover {
+  background: rgba($primary-color, 0.2);
 }
 </style>

@@ -64,3 +64,20 @@ export const generateAuthentication = (url, str) => {
 
 
 // 下载文件
+export const downloadBlockFile = (data, filename) => {
+  const url = window.URL.createObjectURL(data);
+  const link = document.createElement('a');
+  link.style.display = 'none';
+  link.href = url;
+  
+
+  // 自定义下载文件名（如exemple.txt）
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  setTimeout(() => {
+    Window.URL.revokeObjectURL();
+  }, 3 * 1000);
+};
