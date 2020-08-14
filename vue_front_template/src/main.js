@@ -12,7 +12,7 @@ import './assets/css/common.scss';
 import './assets/css/reset.css';
 import './assets/css/element_reset.css';
 import load from './assets/js/map_load.js';
-import imgerr from './directive/imgErr.js';
+import imgerr from '../packages/imgerrtip/index.js';
 import hasPermission from './directive/permission.js';
 import noDataTips from './directive/noData.js';
 

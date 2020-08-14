@@ -1,5 +1,5 @@
 <!--
- * @Description: des
+ * @Description: 无数据
  * @Date: 2020-03-19 09:30:39
  * @Author: LB
  -->
@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'NoDataMsg',
+  name: 'NoData',
   components: {},
   props: {
     data: {
@@ -25,18 +25,14 @@ export default {
     noDataVisible() {
       return this.data.length === undefined || this.data.length === 0;
     }
-  },
-  watch: {},
-  created() {},
-  mounted() {},
-  methods: {}
+  }
 };
 </script>
 <style lang="scss" scoped>
 .wrapper {
   width: 100%;
   height: 100%;
-  background-image: url('~@/assets/images/no-data.png');
+  background-image: url('../images/no-data.png');
   background-position: center;
   background-repeat: no-repeat;
 }
