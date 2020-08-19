@@ -5,8 +5,8 @@
  */ 
 
  
-const NO_FOUND_IMG = require('../images/no-found-img.png');
-const NO_IMG = require('../images/no-img.png');
+const NO_FOUND_IMG = require('./images/no-found-img.png');
+const NO_IMG = require('./images/no-img.png');
 
 const handleImgError = function(el, binding, vnode) {
   if (el.src === null || el.src === '') {

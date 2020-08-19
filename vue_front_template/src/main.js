@@ -11,10 +11,11 @@ import './assets/css/element-variables.scss';
 import './assets/css/common.scss';
 import './assets/css/reset.css';
 import './assets/css/element_reset.css';
+import './assets/js/elmentImport.js';
 import load from './assets/js/map_load.js';
 import imgerr from '../packages/imgerrtip/index.js';
 import hasPermission from './directive/permission.js';
-import noDataTips from './directive/noData.js';
+import noDataTips from '../packages/nodatatip/noData.js';
 
 
 // element组件导入
@@ -27,11 +28,11 @@ Vue.directive('noDataTips', noDataTips);
 
 Vue.config.productionTip = false;
 
-//load().then(() => {
+load().then(() => {
   new Vue({
     router,
     store,
     render: h => h(App)
   }).$mount('#app');
-//});
+});
 

@@ -40,6 +40,14 @@ const menus = [
   {
     cName: '自定义树结构',
     path: '/mtree'
+  },
+  {
+    cName: '百度地图',
+    path: '/map'
+  },
+  {
+    cName: '3D行政区',
+    path: '/3Dmap'
   }
 ];
 

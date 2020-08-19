@@ -12,6 +12,15 @@
         <el-button @click="addEvent">添加监听</el-button>
         <el-button @click="removeEvent">移除监听</el-button>
       </p>
+       <p>
+        <el-button @click="addArea('惠州市')">惠州市</el-button>
+        <el-button @click="addArea('惠城区')">惠城区</el-button>
+        <el-button @click="addArea('惠州市博罗县')">博罗县石湾镇</el-button>
+      </p>
+       <p>
+        <el-button @click="getCityAreas">获取城区</el-button>
+        <el-button @click="drawAreasPolygon">描绘区域</el-button>
+      </p>
       <p>地图中心</p>
       <p>设置坐标点</p>
       <p>设置坐标点</p>
@@ -23,12 +32,13 @@
 </template>
 
 <script>
-import BaiduMap from '@/components/BaiduMap';
-function click(e) {
-  console.log('addMarkersClickEvent', e);
-}
+import BaiduMap from '@/components/baiduMap/BaiduMap';
+
 // 地图实例
 let mapInstance = null;
+
+let areas = [];
+
 export default {
   name: 'BaseTree',
   components: { BaiduMap },
@@ -36,19 +46,29 @@ export default {
     return {};
   },
   created() {},
+  mounted() {
+    mapInstance = this.$refs.baiduMap;
+  },
   methods: {
     addMarders() {
       const lnglats = this.$refs.baiduMap.ramdomCreateLngLats();
-      mapInstance = this.$refs.baiduMap;
       mapInstance.removeMapMarkers();
       mapInstance.addMapMarkers({ lnglats });
     },
     addEvent() {
-      
-      mapInstance.addMarkersClickEvent(click);
+      mapInstance && mapInstance.addMarkersClickEvent(click);
     },
     removeEvent() {
-      mapInstance.removeMarkersClickEvent();
+      mapInstance && mapInstance.removeMarkersClickEvent();
+    },
+    addArea(name) {
+      mapInstance.addAdminArea(name);
+    },
+    getCityAreas() {
+      areas = mapInstance.getCityAreas();
+    },
+    drawAreasPolygon() {
+      mapInstance.drawAreasPolygon(areas);
     }
   }
 };

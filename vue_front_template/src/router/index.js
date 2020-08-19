@@ -19,8 +19,9 @@ const LoginForm = () => import('@/views/form/LoginForm.vue');
 const ModifyPwdForm = () => import('@/views/form/ModifyPwdForm.vue');
 const BasicForm = () => import('@/views/form/BasicForm.vue');
 
-const Page404 = () => import('@/views/404.vue');
+const AreaMap = () => import('@/views/3DEchartAreaMap.vue');
 
+const Page404 = () => import('@/views/404Page.vue');
 
 
 Vue.use(VueRouter);
@@ -70,6 +71,10 @@ const routes = [
         path: 'map',
         name: 'sideMap',
         component: BaseMap
+      }, {
+        path: '3Dmap',
+        name: 'side3DMap',
+        component: AreaMap
       },
       {
         path: '*',
@@ -117,6 +122,10 @@ const routes = [
         path: 'map',
         name: 'topMap',
         component: BaseMap
+      }, {
+        path: '3Dmap',
+        name: 'top3DMap',
+        component: AreaMap
       },
       {
         path: '*',
