@@ -23,15 +23,15 @@
         </template>
       </roll-content-layout>
     </section>
-    <main class="main">
+    <main class="main"> 
       <div class="vertical-layout">
         <main class="main" v-no-data-tips="pageData.length === 0">
           <div class="blok-card card grid-card" v-for="(item,index) in pageData" :key="index">
             <span>{{item.name}}</span>
             <span>{{item.province}}</span>
             <span>{{item.city}}</span>
-            <span class="photo">
-              <img src v-imgerr />
+            <span class="photo" >
+              <img src v-imgerr/>
             </span>
             <span class="date">{{item.date}}</span>
             <span class="address">{{item.address}}</span>

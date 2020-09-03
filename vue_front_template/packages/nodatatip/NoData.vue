@@ -5,34 +5,24 @@
  -->
 
 <template>
-  <div class="no-data-msg"></div>
+  <div  v-show="visible" class="no-data-msg"></div>
 </template>
 
 <script>
 export default {
   name: 'NoData',
-  components: {},
-  props: {
-    data: {
-      type: Array,
-      required: true
-    }
-  },
   data() {
-    return {};
-  },
-  computed: {
-    noDataVisible() {
-      return this.data.length === undefined || this.data.length === 0;
-    }
+    return {
+      visible: false
+    };
   }
 };
 </script>
 <style lang="scss" scoped>
-.wrapper {
+.no-data-msg {
   width: 100%;
   height: 100%;
-  background-image: url('../images/no-data.png');
+  background-image: url('./images/no-data.png');
   background-position: center;
   background-repeat: no-repeat;
 }

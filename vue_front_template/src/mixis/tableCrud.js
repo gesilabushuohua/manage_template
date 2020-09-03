@@ -1,5 +1,5 @@
 /*
- * @Description: 表格增删查改、页码更滑等相关操作函数
+ * @Description: 表格增删查改、页码更改等相关操作函数
  * @Date: 2020-06-10 12:05:49
  * @Author: LB
  */
@@ -162,25 +162,30 @@ export default {
       });
     },
 
-    // 提交 添加、编辑 表单
+    // 提交 添加、编辑 基础表单
     async submitBaseForm() {
       const requestFn = this.submitType === 'add' ? this.requestAddFn : this.requestEditFn;
       const params = { ...this.baseForm };
-      const optSuccessFn = () => { this.baseFormVisible = false; };
       this.submitting = true;
-      await this.crudData(params, requestFn, optSuccessFn);
+      const res = await requestFn(params);
       this.submitting = false;
+      if (res) {
+        this.baseFormVisible = false;
+        this.getTableData();
+      }
     },
+
 
     async delTableData(row) {
       if (!this.requestDelFn) {
         return;
       }
       const params = row.id;
-      const optSuccess = this.delChangePage;
       this.deling = true;
-      await this.crudData(params, this.requestDelFn, optSuccess);
+      const res = await this.requestDelFn(params);
       this.deling = false;
+      this.delChangePage();
+      this.getTableData();
     },
 
     delChangePage(del) {
@@ -193,26 +198,6 @@ export default {
       if (delNum === pageNum) {
         this.currentPage = this.currentPage - 1;
       }
-    },
-
-    // 增、改、删数据提交
-    crudData(params, optFn, optSuccessFn) {
-      optFn(params)
-        .then(res => {
-          this.$message({
-            message: '操作成功',
-            type: 'success'
-          });
-          optSuccessFn && optSuccessFn(params);
-          this.getTableData();
-        })
-        .catch(err => {
-          this.$message({
-            message: '操作失败',
-            type: 'error'
-          });
-          console.error(err);
-        });
     },
 
     exportFile() {

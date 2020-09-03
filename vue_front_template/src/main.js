@@ -15,7 +15,7 @@ import './assets/js/elmentImport.js';
 import load from './assets/js/map_load.js';
 import imgerr from '../packages/imgerrtip/index.js';
 import hasPermission from './directive/permission.js';
-import noDataTips from '../packages/nodatatip/noData.js';
+import noDataTips from '../packages/nodatatip/index.js';
 
 
 // element组件导入
